@@ -1,0 +1,10 @@
+[user]
+	name = Alex Kowalczuk
+	email = alex.kowalczuk@snapsheet.me
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	staged = "diff --staged"
+	aa = "add -A"
