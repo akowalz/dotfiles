@@ -10,7 +10,7 @@ echo 'Setting up .gitconfig'
 ln -fs $(realpath .gitconfig) ~/.gitconfig 
 
 echo 'Setting up .git_prompt_colors'
-ln -fs $(realpath .gitconfig) ~/.gitconfig 
+ln -fs $(realpath .git-prompt-colors.sh) ~/.git-prompt-colors.sh
 
 echo 'Setting up .tmux.conf'
 ln -fs $(realpath .tmux.conf) ~/.tmux.conf 
