@@ -12,6 +12,9 @@ ln -fs $(realpath .gitconfig) ~/.gitconfig
 echo 'Setting up .git_prompt_colors'
 ln -fs $(realpath .gitconfig) ~/.gitconfig 
 
+echo 'Setting up .tmux.conf'
+ln -fs $(realpath .tmux.conf) ~/.tmux.conf 
+
 echo 'Setting up vim'
 ln -fs $(realpath .vim) ~/.vim 
 ln -fs $(realpath .vim/.vimrc) ~/.vimrc
