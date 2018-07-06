@@ -75,12 +75,14 @@ let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_buil
 " Mappings
 nnoremap <silent> <Leader>nh :noh<CR>
 nnoremap <silent> <Leader>vc :source ~/.vimrc<CR>
+nnoremap <silent> Q <NOP>
 
 nnoremap <silent> k gk
 nnoremap <silent> j gj
 nnoremap <silent> Y y$
 
 imap <C-L> <SPACE>=><SPACE>
+imap <C-J> <SPACE>-><SPACE>
 imap <silent> jk <ESC>
 
 " Plugin Mappings

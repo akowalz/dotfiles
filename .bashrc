@@ -23,7 +23,7 @@ fi
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 export GIT_PROMPT_START="\e[0;93m(\w)\e[0m"
-export GIT_PROMPT_END=" $ "
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $ "
 
 # PATH adjustments
 export PATH=${PATH}:/usr/local/mysql/bin
