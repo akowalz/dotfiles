@@ -17,6 +17,10 @@ export EDITOR=vim
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Appearance
+export NO_COLOR='\[\033[0m\]'
+color256() { echo "\[\033[38;5;$1m\]"; }
+nocolor() { echo $NO_COLOR; }
+
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
 
@@ -26,8 +30,8 @@ if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
-export GIT_PROMPT_START="\[\e[0;93m\](\w)\[\e[0m\]"
-export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ \[\e[0m\]$ "
+export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$(nocolor)"
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $(nocolor)$ "
 
 # PATH adjustments
 export PATH=${PATH}:/usr/local/mysql/bin
