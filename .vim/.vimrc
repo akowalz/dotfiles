@@ -111,14 +111,19 @@ function! SpecBaseCmd()
   endif
 endfunction
 
-let run_buffer_cmd = SpecBaseCmd() . bufname("%")
-let run_focused_cmd = SpecBaseCmd() . bufname("%") . ":" . line(".")
+function! RunBufferCmd()
+  return SpecBaseCmd() . bufname("%")
+endfunction
+
+function! RunFocusedCmd()
+  return SpecBaseCmd() . bufname("%") . ":" . line(".")
+endfunction
 
 function! ClearAndEchoCmd(cmd)
   return "clear && echo " . a:cmd . " && " . a:cmd
 endfunction
 
-nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEchoCmd(run_buffer_cmd))<CR>
-nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEchoCmd(run_focused_cmd))<CR>
+nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEchoCmd(RunBufferCmd()))<CR>
+nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEchoCmd(RunFocusedCmd()))<CR>
 nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
 nnoremap <silent> <Leader>vp :VimuxPromptCommand<CR>
