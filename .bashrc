@@ -13,14 +13,18 @@ alias cds='cd ~/snapsheet'
 
 export EDITOR=vim
 
+# Added by FZF
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Appearance
+export CLICOLOR=1
+export LSCOLORS="GxFxCxDxBxegedabagaced"
+
 # git-bash-prompt
 if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
   __GIT_PROMPT_DIR=$(brew --prefix)/opt/bash-git-prompt/share
   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
 fi
-
-# Added by FZF
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 export GIT_PROMPT_START="\[\e[0;93m\](\w)\[\e[0m\]"
 export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ \[\e[0m\]$ "
