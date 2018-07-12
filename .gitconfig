@@ -7,4 +7,9 @@
 	ci = commit
 	st = status
 	staged = "diff --staged"
-	aa = "add -A"
+  aa = "add -A"
+  redo = "!git add . && git commit --amend --no-edit && git push --force-with-lease"
+  fixup = commit --fixup HEAD
+  pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+[push]
+	default = simple
