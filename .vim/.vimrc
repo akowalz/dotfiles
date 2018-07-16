@@ -1,6 +1,7 @@
 " Plugins
 " ====================
 call plug#begin('~/.vim/plugged')
+
 " Navigation
 Plug 'scrooloose/nerdtree'
 
@@ -18,8 +19,8 @@ Plug 'junegunn/fzf.vim'
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
 Plug 'mxw/vim-jsx'
-Plug 'tpope/vim-rails'
 Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-rails'
 
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
@@ -35,7 +36,6 @@ set incsearch
 set hidden
 set backspace=indent,eol,start
 set textwidth=0 nosmartindent tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-set ruler
 set wrap
 set dir=/tmp//
 set scrolloff=5
@@ -76,6 +76,12 @@ augroup cursorline_in_insert_mode
   autocmd InsertEnter,InsertLeave * set cul!
 augroup END
 
+" Write file when leaving insert mode
+augroup write_on_leave_insert
+  autocmd!
+  autocmd InsertLeave * if !(@% == '') | update | endif
+augroup END
+
 " Highlight trailling whitespace, except when in insert mode
 augroup highlight_extra_whitespace
   autocmd!
@@ -91,6 +97,7 @@ augroup END
 
 " Plugin Settings
 " ===============
+"
 " FZF
 let g:fzf_layout = { 'down': '~25%' }
 let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_build/|node_modules/|vendor/"'
@@ -101,56 +108,78 @@ let g:NERDCreateDefaultMappings = 0
 " vim-closetag, close tags with t instead of >
 let g:closetag_filetypes = 'html,javascript.jsx'
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.jsx,*.js,*.erb'
-let g:closetag_shortcut = 't'
+" let g:closetag_shortcut = 't'
 
 " ale
 let g:ale_fixers = {'javascript': ['eslint']}
 let g:ale_sign_error = "•"
 let g:ale_sign_warning = "-"
 
+
 " Mappings
 " ========
 
 " Set leader to space
 let mapleader ="\<Space>"
+nnoremap \\ <NOP>
 
-" Clear search highlighting
-nnoremap <silent> <Leader>nh :nohlsearch<CR>
-nnoremap <silent> <C-l> :nohlsearch<CR>
+" Insert mode mappings
+" Exit insert mode with jk, no more escape for you.
+inoremap jk <ESC>
+inoremap <ESC> <NOP>
 
-" Source vimrc with <Leader>vc
-nnoremap <silent> <Leader>vc :source ~/.vimrc<CR>:echo "Reloaded .vimrc"<CR>
+" Ctrl-l in insert mode to insert a hash rocket
+inoremap <C-L> <SPACE>=><SPACE>
 
-nnoremap <silent> Q <NOP>
+" Write with leader w
+nnoremap <Leader>w :write<CR>
 
-nnoremap <silent> k gk
-nnoremap <silent> j gj
-nnoremap <silent> Y y$
+" Disable ex mode
+nnoremap Q <NOP>
+
+" Go back to the previous file with C-e
+nnoremap <C-e> :e#<CR>
 
 " Join lines without extra space with K
-nnoremap <silent> K Jx<ESC>
+nnoremap K Jx<ESC>
 
-" Indent whole file while preserving cursor.
-nnoremap <silent> <Leader>i gg=G<C-o><C-o>
+" Indent whole file while preserving cursor location
+nnoremap <Leader>i m'gg=G`'
 
-inoremap <C-L> <SPACE>=><SPACE>
-inoremap <silent> jk <ESC>
-inoremap <silent> <ESC> <ESC>:echo "Use jk"<CR>i
+" Clear search highlighting
+nnoremap <Leader>nh :nohlsearch<CR>
+nnoremap <C-l> :nohlsearch<CR>
 
-" \on changes the current `test` to `test.only`
-nnoremap <silent> <Leader>on ?test(<CR>ea.only<ESC>:noh<CR>
+" Clear trailing whitespace
+nnoremap <Leader>cw :%s/\s\+$//g<CR>
 
-" Plugin Mappings
+" Change the current `test` to `test.only`
+nnoremap <Leader>on ?test(<CR>ea.only<ESC>:noh<CR>
+
+" Add a semicolon to the current line without moving the cursor with <leader>;
+nnoremap <Leader>; m'A;<ESC>`'
+
+" Change single quotes to double quotes with <Leader>''
+nnoremap <Leader>"" m'F'r"f'r"`'
+
+" Change double quotes to single quotes with <Leader>''
+nnoremap <Leader>'' m'F"r'f"r'`'
+
+" Source vimrc with <Leader>vc
+nnoremap <Leader>vc :source ~/.vimrc<CR>:echo "Reloaded .vimrc"<CR>
+
+" Plugin Command Mappings
+"
 " Nerdtree mappings
-nnoremap <silent> <Leader>nt :NERDTreeToggle<CR>
-nnoremap <silent> <Leader>nr :NERDTree<CR>
-nnoremap <silent> <Leader>nf :NERDTreeFind<CR>
+nnoremap <Leader>nt :NERDTreeToggle<CR>
+nnoremap <Leader>nr :NERDTree<CR>
+nnoremap <Leader>nf :NERDTreeFind<CR>
 
 " TComment leader cc to toggle comments
-map <silent> <LocalLeader>cc :TComment<CR>
+map <Leader>cc :TComment<CR>
 
 " FZF - search for files with Ctrl P
-nnoremap <silent> <C-p> :Files<CR>
+nnoremap <C-p> :Files<CR>
 
 " Command Aliases
 " ===============
@@ -158,7 +187,7 @@ command! W w
 
 " Vimux
 " =====
-function! SpecBaseCmd()
+function! BaseCommand()
   if (&filetype=='javascript.jsx')
     return "npm test "
   elseif filereadable(".zeus.sock")
@@ -168,19 +197,19 @@ function! SpecBaseCmd()
   endif
 endfunction
 
-function! RunBufferCmd()
-  return SpecBaseCmd() . bufname("%")
+function! RunBuffer()
+  return BaseCommand() . bufname("%")
 endfunction
 
-function! RunFocusedCmd()
-  return SpecBaseCmd() . bufname("%") . ":" . line(".")
+function! RunFocused()
+  return BaseCommand() . bufname("%") . ":" . line(".")
 endfunction
 
-function! ClearAndEchoCmd(cmd)
+function! ClearAndEcho(cmd)
   return "clear && echo " . a:cmd . " && " . a:cmd
 endfunction
 
-nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEchoCmd(RunBufferCmd()))<CR>
-nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEchoCmd(RunFocusedCmd()))<CR>
-nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
-nnoremap <silent> <Leader>r :VimuxPromptCommand<CR>
+nnoremap <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
+nnoremap <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
+nnoremap <Leader>rl :VimuxRunLastCommand<CR>
+nnoremap <Leader>rr :VimuxPromptCommand<CR>
