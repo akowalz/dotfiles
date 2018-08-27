@@ -25,6 +25,7 @@ Plug 'tpope/vim-rails'
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
 call plug#end()
 
 " General settings
@@ -60,34 +61,26 @@ colorscheme PaperColor
 set laststatus=2
 set noshowmode " don't show -- INSERT -- because lightline does it for you
 
+" always show the sign column so ALE doesn't bump the buffer around
+set signcolumn=yes
 " sign column (left bar) should display in same color as rest of vim
 highlight SignColumn ctermbg=NONE
-
-" ale - make signs prettier
-highlight ALEErrorSign ctermbg=NONE ctermfg=DarkRed
-highlight ALEWarningSign ctermbg=NONE ctermfg=Yellow
 
 " Autocommands
 " ============
 
-" Highlight cursorline in insert mode
-augroup cursorline_in_insert_mode
-  autocmd!
-  autocmd InsertEnter,InsertLeave * set cul!
-augroup END
-
-" Write file when leaving insert mode
+" Write file when leaving insert mode, unless buffer is not saved
 augroup write_on_leave_insert
   autocmd!
   autocmd InsertLeave * if !(@% == '') | update | endif
 augroup END
 
 " Highlight trailling whitespace, except when in insert mode
-augroup highlight_extra_whitespace
-  autocmd!
-  autocmd InsertEnter * highlight clear ExtraWhitespace
-  autocmd InsertLeave * highlight ExtraWhitespace ctermbg=Red | match ExtraWhitespace /\s\+$/
-augroup END
+" augroup highlight_extra_whitespace
+"   autocmd!
+"   autocmd InsertEnter * highlight ExtraWhitespace ctermbg=None
+"   autocmd InsertLeave * highlight ExtraWhitespace ctermbg=Red | match ExtraWhitespace /\s\+$/
+" augroup END
 
 " Set filetype to javascript for js.snap files
 augroup filetype_for_js_snap_file
@@ -105,16 +98,40 @@ let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_buil
 " NERDTree
 let g:NERDCreateDefaultMappings = 0
 
-" vim-closetag, close tags with t instead of >
 let g:closetag_filetypes = 'html,javascript.jsx'
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.jsx,*.js,*.erb'
-" let g:closetag_shortcut = 't'
 
 " ale
-let g:ale_fixers = {'javascript': ['eslint']}
+highlight ALEErrorSign ctermbg=NONE ctermfg=DarkRed
+highlight ALEWarningSign ctermbg=NONE ctermfg=Yellow
+
+let g:ale_fixers = {'javascript': ['eslint'], 'ruby': ['rubocop']}
 let g:ale_sign_error = "•"
 let g:ale_sign_warning = "-"
+let g:ale_set_highlights = 0
 
+" Lightline
+let g:lightline = {}
+let g:lightline#ale#indicator_ok = '✔'
+
+let g:lightline = {
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'readonly', 'filename', 'modified', 'linter_checking', 'linter_ok' ] ],
+      \ },
+      \ 'component_function': {
+      \   'filename': 'LightlineFullPath',
+      \   'hellothere': 'HelloThere',
+      \ },
+      \ 'component_expand': {
+      \     'linter_checking': 'lightline#ale#checking',
+      \     'linter_ok': 'lightline#ale#ok',
+      \   },
+      \ }
+
+function! LightlineFullPath()
+  return expand('%')
+endfunction
 
 " Mappings
 " ========
@@ -131,7 +148,7 @@ inoremap <ESC> <NOP>
 " Ctrl-l in insert mode to insert a hash rocket
 inoremap <C-L> <SPACE>=><SPACE>
 
-" Write with leader w
+" Write with <Leader>w
 nnoremap <Leader>w :write<CR>
 
 " Disable ex mode
@@ -143,20 +160,20 @@ nnoremap <C-e> :e#<CR>
 " Join lines without extra space with K
 nnoremap K Jx<ESC>
 
-" Indent whole file while preserving cursor location
+" Indent whole file while preserving cursor location with <Leader>i
 nnoremap <Leader>i m'gg=G`'
 
-" Clear search highlighting
+" Clear search highlighting with <Leader>nh or Ctrl-l
 nnoremap <Leader>nh :nohlsearch<CR>
 nnoremap <C-l> :nohlsearch<CR>
 
-" Clear trailing whitespace
+" Clear trailing whitespace with <Leader>cw
 nnoremap <Leader>cw :%s/\s\+$//g<CR>
 
-" Change the current `test` to `test.only`
+" Change the current `test` to `test.only` with <Leader>on
 nnoremap <Leader>on ?test(<CR>ea.only<ESC>:noh<CR>
 
-" Add a semicolon to the current line without moving the cursor with <leader>;
+" Add a semicolon to the current line without moving the cursor with <Leader>;
 nnoremap <Leader>; m'A;<ESC>`'
 
 " Change single quotes to double quotes with <Leader>''
@@ -169,11 +186,14 @@ nnoremap <Leader>'' m'F"r'f"r'`'
 nnoremap <Leader>vc :source ~/.vimrc<CR>:echo "Reloaded .vimrc"<CR>
 
 " Plugin Command Mappings
-"
+
 " Nerdtree mappings
 nnoremap <Leader>nt :NERDTreeToggle<CR>
 nnoremap <Leader>nr :NERDTree<CR>
 nnoremap <Leader>nf :NERDTreeFind<CR>
+
+" ALE
+nnoremap <Leader>af :ALEFix<CR>
 
 " TComment leader cc to toggle comments
 map <Leader>cc :TComment<CR>
@@ -183,6 +203,7 @@ nnoremap <C-p> :Files<CR>
 
 " Command Aliases
 " ===============
+" Allow writing files with capital :W, since it's so easy to enter accidentally
 command! W w
 
 " Vimux
@@ -190,7 +211,7 @@ command! W w
 function! BaseCommand()
   if (&filetype=='javascript.jsx')
     return "npm test "
-  elseif filereadable(".zeus.sock")
+  elseif !empty(glob(".zeus.sock"))
     return "zeus rspec "
   else
     return "bundle exec rspec "
@@ -209,7 +230,7 @@ function! ClearAndEcho(cmd)
   return "clear && echo " . a:cmd . " && " . a:cmd
 endfunction
 
-nnoremap <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
-nnoremap <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
-nnoremap <Leader>rl :VimuxRunLastCommand<CR>
-nnoremap <Leader>rr :VimuxPromptCommand<CR>
+nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
+nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
+nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
+nnoremap <silent> <Leader>rr :VimuxPromptCommand<CR>
