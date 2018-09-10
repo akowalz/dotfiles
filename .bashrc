@@ -11,6 +11,8 @@ alias vi='vim'
 
 alias cds='cd ~/snapsheet'
 
+alias weather='curl wttr.in/chicago'
+
 export EDITOR=vim
 
 # Added by FZF
