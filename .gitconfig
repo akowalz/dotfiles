@@ -6,10 +6,12 @@
 	br = branch
 	ci = commit
 	st = status
+  rb = rebase
+  ap = add --patch
+  fixup = commit --fixup HEAD
 	staged = "diff --staged"
   aa = "add -A"
-  redo = "!git add . && git commit --amend --no-edit && git push --force-with-lease"
-  fixup = commit --fixup HEAD
+  redo = "git commit --amend --no-edit && git push --force-with-lease"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
 [push]
 	default = simple
