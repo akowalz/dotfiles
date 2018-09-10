@@ -15,8 +15,9 @@ alias weather='curl wttr.in/chicago'
 
 export EDITOR=vim
 
-# Added by FZF
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# Uncomment to use fzf on commandline
+# Removed because it's a bit heavy handed for history search, for example.
+# [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # Appearance
 export NO_COLOR='\[\033[0m\]'
