@@ -1,24 +1,32 @@
-#!/bin/sh
+#!/bin/bash
 
-echo 'Setting up .bashrc'
-ln -fs $(realpath .bashrc) ~/.bashrc 
+symlink () {
+  dest=~/$1
+  echo "Setting up $1"
 
-echo 'Setting up .bash_profile'
-ln -fs $(realpath .bash_profile) ~/.bash_profile 
+  if [ -e $dest ]
+  then
+    echo "$dest already exists, skipping."
+  else
+    echo "Linking $1 to $dest"
+    ln -fs $(realpath $1) $dest
+  fi
 
-echo 'Setting up .gitconfig'
-ln -fs $(realpath .gitconfig) ~/.gitconfig 
+  printf "\n"
+}
 
-echo 'Setting up .git_prompt_colors'
-ln -fs $(realpath .git-prompt-colors.sh) ~/.git-prompt-colors.sh
+printf "Setting up config files.\n\n"
 
-echo 'Setting up .tmux.conf'
-ln -fs $(realpath .tmux.conf) ~/.tmux.conf 
+symlink .bashrc
+symlink .bash_profile
 
-echo 'Setting up vim'
-ln -fs $(realpath .vim) ~/.vim 
-ln -fs $(realpath .vim/.vimrc) ~/.vimrc
+symlink .gitconfig
+symlink .git-prompt-colors.sh
 
-echo 'Done.'
+symlink .tmux.conf
 
-echo 'You may want to install homebrew, bash-git-prompt, and install vim plugins'
+symlink .vim
+symlink .vimrc
+
+echo "Done."
+echo "You may want to install homebrew, bash-git-prompt, and install vim plugins."
