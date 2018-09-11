@@ -29,4 +29,4 @@ symlink vim
 symlink vimrc
 
 echo "Done."
-echo "You may want to install homebrew, bash-git-prompt, and install vim plugins."
+echo "Run the install script (./install.sh) to install dependencies."

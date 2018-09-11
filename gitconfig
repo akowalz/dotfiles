@@ -8,10 +8,11 @@
 	st = status
   rb = rebase
   ap = add --patch
+  amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
 	staged = "diff --staged"
-  aa = "add -A"
-  redo = "git commit --amend --no-edit && git push --force-with-lease"
+  aa = add -A
+  redo = "!git commit --amend --no-edit && git push --force-with-lease"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
 [push]
 	default = simple
