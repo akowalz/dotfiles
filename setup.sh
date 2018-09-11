@@ -1,7 +1,7 @@
 #!/bin/bash
 
 symlink () {
-  dest=~/$1
+  dest=~/.$1
   echo "Setting up $1"
 
   if [ -e $dest ]
@@ -17,16 +17,16 @@ symlink () {
 
 printf "Setting up config files.\n\n"
 
-symlink .bashrc
-symlink .bash_profile
+symlink bashrc
+symlink bash_profile
 
-symlink .gitconfig
-symlink .git-prompt-colors.sh
+symlink gitconfig
+symlink git-prompt-colors.sh
 
-symlink .tmux.conf
+symlink tmux.conf
 
-symlink .vim
-symlink .vimrc
+symlink vim
+symlink vimrc
 
 echo "Done."
 echo "You may want to install homebrew, bash-git-prompt, and install vim plugins."
