@@ -9,6 +9,9 @@ alias be='bundle exec'
 
 alias vi='vim'
 
+alias ll='ls -al'
+alias l='fc -s' # run last command
+
 alias cds='cd ~/snapsheet'
 
 alias weather='curl wttr.in/chicago'
