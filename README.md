@@ -15,3 +15,13 @@ The setup script will create symlinks from this repo to your home directory, ski
 ```sh
 ./setup.sh
 ```
+
+## Other notes
+
+Some Vim settings and plugins require Vim 8+, which can be install via homebrew.
+
+To automatically attach to a tmux session every time a new terminal window is opened, configure Terminal to run the following on startup (Terminal > Preferences > Shell > Startup > Run Command):
+
+```sh
+tmux new-session -A -s main
+```
