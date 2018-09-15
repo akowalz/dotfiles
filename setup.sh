@@ -28,5 +28,7 @@ symlink tmux.conf
 symlink vim
 symlink vimrc
 
+echo "Installing vim plugins."
+vim +PlugInstall +qall
+
 echo "Done."
-echo "Run the install script (./install.sh) to install dependencies."

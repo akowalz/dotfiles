@@ -7,6 +7,12 @@ if ! type brew &> /dev/null; then
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
+echo "Checking for coreutils..."
+if ! brew list coreutils &> /dev/null; then
+  echo "Installing coreutils via homebrew."
+  brew install coreutils
+fi
+
 echo "Checking for tmux..."
 if ! type tmux &> /dev/null; then
   echo "Installing tmux."
@@ -23,7 +29,5 @@ else
   echo "Already installed."
 fi
 
-echo "Installing vim plugins."
-vim +PlugInstall +qall
-
 echo "Done."
+echo "Run the setup script to configure these utilites."

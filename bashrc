@@ -12,8 +12,6 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -s' # run last command
 
-alias cds='cd ~/snapsheet'
-
 alias weather='curl wttr.in/chicago'
 
 # Uncomment to use fzf on commandline
@@ -49,9 +47,4 @@ export EDITOR=vim
 
 # PATH adjustments
 export PATH=${PATH}:/usr/local/mysql/bin
-export PATH=${PATH}:$HOME/snapsheet/git-scripts
 export PATH=${PATH}:$HOME/bin
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change. (added by RVM)
-export PATH="$PATH:$HOME/.rvm/bin"
-source ~/.rvm/scripts/rvm
