@@ -7,6 +7,8 @@ alias gl='git log'
 alias bi='bundle install'
 alias be='bundle exec'
 
+alias dc-exec='docker-compose exec'
+
 alias vi='vim'
 
 alias ll='ls -al'
@@ -47,4 +49,11 @@ export EDITOR=vim
 
 # PATH adjustments
 export PATH=${PATH}:/usr/local/mysql/bin
-export PATH=${PATH}:$HOME/bin
+export PATH=$HOME/bin:$PATH
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Set docker machine environment
+eval `docker-machine env`

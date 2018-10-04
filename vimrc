@@ -18,9 +18,9 @@ Plug 'junegunn/fzf.vim'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
+Plug 'mustache/vim-mustache-handlebars'
 
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
@@ -75,13 +75,6 @@ augroup write_on_leave_insert
   autocmd InsertLeave * if !(@% == '') | update | endif
 augroup END
 
-" Highlight trailling whitespace, except when in insert mode
-" augroup highlight_extra_whitespace
-"   autocmd!
-"   autocmd InsertEnter * highlight ExtraWhitespace ctermbg=None
-"   autocmd InsertLeave * highlight ExtraWhitespace ctermbg=Red | match ExtraWhitespace /\s\+$/
-" augroup END
-
 " Set filetype to javascript for js.snap files
 augroup filetype_for_js_snap_file
   autocmd!
@@ -98,9 +91,6 @@ let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_buil
 " NERDTree
 let g:NERDCreateDefaultMappings = 0
 
-let g:closetag_filetypes = 'html,javascript.jsx'
-let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.jsx,*.js,*.erb'
-
 " ale
 highlight ALEErrorSign ctermbg=NONE ctermfg=DarkRed
 highlight ALEWarningSign ctermbg=NONE ctermfg=Yellow
@@ -109,6 +99,7 @@ let g:ale_fixers = {'javascript': ['eslint'], 'ruby': ['rubocop']}
 let g:ale_sign_error = "•"
 let g:ale_sign_warning = "-"
 let g:ale_set_highlights = 0
+let g:ale_echo_msg_format = '[%linter%]: %s'
 
 " Lightline
 let g:lightline = {}
@@ -117,11 +108,10 @@ let g:lightline#ale#indicator_ok = '✔'
 let g:lightline = {
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename', 'modified', 'linter_checking', 'linter_ok' ] ],
+      \             [ 'readonly', 'filename', 'modified', 'linter_checking', 'linter_ok'] ],
       \ },
       \ 'component_function': {
       \   'filename': 'LightlineFullPath',
-      \   'hellothere': 'HelloThere',
       \ },
       \ 'component_expand': {
       \     'linter_checking': 'lightline#ale#checking',
@@ -145,6 +135,9 @@ nnoremap \\ <NOP>
 inoremap jk <ESC>
 inoremap <ESC> <NOP>
 
+" search for documentation in Dash for word under cursor with <Leader>da
+nnoremap <Leader>da :!open 'dash://<cword>'<CR>
+
 " Ctrl-l in insert mode to insert a hash rocket
 inoremap <C-L> <SPACE>=><SPACE>
 
@@ -154,14 +147,18 @@ nnoremap <Leader>w :write<CR>
 " Disable ex mode
 nnoremap Q <NOP>
 
+" Toggle paste mode and enter insert mode with <Leader>pp
+nnoremap <Leader>pp :set paste!<CR>
+
 " Go back to the previous file with C-e
 nnoremap <C-e> :e#<CR>
 
 " Join lines without extra space with K
 nnoremap K Jx<ESC>
 
-" Indent whole file while preserving cursor location with <Leader>i
+" Indent whole file while preserving cursor location with <Leader>i or <Leader>=
 nnoremap <Leader>i m'gg=G`'
+nnoremap <Leader>= m'gg=G`'
 
 " Clear search highlighting with <Leader>nh or Ctrl-l
 nnoremap <Leader>nh :nohlsearch<CR>
@@ -203,34 +200,11 @@ nnoremap <C-p> :Files<CR>
 
 " Command Aliases
 " ===============
+
 " Allow writing files with capital :W, since it's so easy to enter accidentally
 command! W w
 
-" Vimux
+" Vimux (settings became pretty complex, so moved to a separate file)
 " =====
-function! BaseCommand()
-  if (&filetype=='javascript.jsx')
-    return "npm test "
-  elseif !empty(glob(".zeus.sock"))
-    return "zeus rspec "
-  else
-    return "bundle exec rspec "
-  endif
-endfunction
 
-function! RunBuffer()
-  return BaseCommand() . bufname("%")
-endfunction
-
-function! RunFocused()
-  return BaseCommand() . bufname("%") . ":" . line(".")
-endfunction
-
-function! ClearAndEcho(cmd)
-  return "clear && echo " . a:cmd . " && " . a:cmd
-endfunction
-
-nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
-nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
-nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
-nnoremap <silent> <Leader>rr :VimuxPromptCommand<CR>
+source ~/.vim/vimux_settings.vim
