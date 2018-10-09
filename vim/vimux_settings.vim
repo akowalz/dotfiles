@@ -1,60 +1,20 @@
 function! TestRunner()
-  let runners = {
-        \ 'ruby' : RubyTestRunner(),
-        \ 'php'  : PhpTestRunner(),
-        \ 'javascript' : 'unimplemented',
-        \ }
-
-  return get(runners, &filetype, "VIMUX_RUNNER_NOT_FOUND")
+  " define in after/ftplugin file
+  if exists("b:vimux_test_runner")
+    return b:vimux_test_runner
+  else
+    return "VIMUX_TEST_RUNNER_NOT_SET"
+  endif
 endfunction
 
 function! CurrentBufferSpecifier()
-  let specifiers = {
-        \ 'ruby' : expand('%'),
-        \ 'php'  : expand('%'),
-        \ }
-
-  return get(specifiers, &filetype, "VIMUX_RUNNER_NOT_FOUND")
+  " define in after/ftplugin file
+  return "VIMUX_BUFFER_SPECIFIER_NOT_SET"
 endfunction
 
 function! FocusedTestSpecifier()
-  let specifiers = {
-        \ 'ruby' : ":" . line("."),
-        \ 'php'  : PhpFocusedTestSpecifier(),
-        \ }
-
-  return get(specifiers, &filetype, "VIMUX_RUNNER_NOT_FOUND")
-endfunction
-
-function! RubyTestRunner()
-  if !empty(glob(".zeus.sock"))
-    return "zeus rspec"
-  endif
-
-  return "bundle exec rspec"
-endfunction
-
-function! PhpTestRunner()
-  if expand("%") =~ "spec"
-    return "vendor/bin/phpspec run"
-  endif
-
-  return "vendor/bin/phpunit"
-endfunction
-
-function! PhpFocusedTestSpecifier()
-  if (TestRunner() == "vendor/bin/phpspec run")
-    return ":" . line(".")
-  endif
-
-  if (TestRunner() == "vendor/bin/phpunit")
-    return " --filter " . CurrentPhpFunctionName()
-  endif
-endfunction
-
-function! CurrentPhpFunctionName()
-  execute "normal! m'?function\<CR>\"vyy`':nohlsearch\<CR>"
-  return matchlist(@v, 'function \(\w\+\)')[1]
+  " define in after/ftplugin file
+  return "VIMUX_FOCUSED_TEST_SPECIFIER"
 endfunction
 
 function! RunBuffer()
@@ -73,3 +33,5 @@ nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR
 nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
 nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
 nnoremap <silent> <Leader>rr :VimuxPromptCommand<CR>
+nnoremap <silent> <Leader>vi :VimuxInspectRunner<CR>
+nnoremap <silent> <Leader>vz :VimuxZoomRunner<CR>

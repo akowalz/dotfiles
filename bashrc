@@ -14,6 +14,8 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -s' # run last command
 
+alias j='python -m json.tool'
+
 alias weather='curl wttr.in/chicago'
 
 # Uncomment to use fzf on commandline

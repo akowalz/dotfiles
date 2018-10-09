@@ -1,5 +1,4 @@
-" Plugins
-" ====================
+" Plugins ------------------- {{{
 call plug#begin('~/.vim/plugged')
 
 " Navigation
@@ -27,9 +26,9 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 call plug#end()
+" }}}
 
-" General settings
-" ================
+" General settings ---------- {{{
 set hlsearch
 set number
 set showmatch
@@ -45,9 +44,10 @@ set smartcase
 set wildignore+=*.pyc,*.o,*.class,*.lo,.git,vendor/*,node_modules/**,bower_components/**,*/build_gradle/*,*/build_intellij/*,*/build/*,*/cassandra_data/*
 set mouse=
 set ttymouse=
+set foldlevelstart=99
+" }}}
 
-" Appearance
-" ==========
+" Appearance ---------------- {{{
 set background=dark
 
 let g:PaperColor_Theme_Options = {
@@ -57,18 +57,22 @@ let g:PaperColor_Theme_Options = {
       \     }
       \   }
       \ }
+
 colorscheme PaperColor
+
 set laststatus=2
 set noshowmode " don't show -- INSERT -- because lightline does it for you
 
 " always show the sign column so ALE doesn't bump the buffer around
 set signcolumn=yes
+
 " sign column (left bar) should display in same color as rest of vim
 highlight SignColumn ctermbg=NONE
+highlight Folded ctermbg=Black
+" }}}
 
-" Autocommands
-" ============
-
+" Autocommands -------------- {{{
+"
 " Write file when leaving insert mode, unless buffer is not saved
 augroup write_on_leave_insert
   autocmd!
@@ -81,8 +85,13 @@ augroup filetype_for_js_snap_file
   autocmd BufNewFile,BufRead *.js.snap set filetype=javascript.jsx
 augroup END
 
-" Plugin Settings
-" ===============
+augroup filetype_vim
+  autocmd!
+  autocmd FileType vim setlocal foldmethod=marker
+augroup END
+" }}}
+
+" Plugin Settings ----------- {{{
 "
 " FZF
 let g:fzf_layout = { 'down': '~25%' }
@@ -122,10 +131,10 @@ let g:lightline = {
 function! LightlineFullPath()
   return expand('%')
 endfunction
+" }}}
 
-" Mappings
-" ========
-
+" Mappings ------------------ {{{
+"
 " Set leader to space
 let mapleader ="\<Space>"
 nnoremap \\ <NOP>
@@ -179,6 +188,9 @@ nnoremap <Leader>"" m'F'r"f'r"`'
 " Change double quotes to single quotes with <Leader>''
 nnoremap <Leader>'' m'F"r'f"r'`'
 
+" Fold/Unfold with <Leader>ff
+nnoremap <Leader>ff za
+
 " Source vimrc with <Leader>vc
 nnoremap <Leader>vc :source ~/.vimrc<CR>:echo "Reloaded .vimrc"<CR>
 
@@ -197,14 +209,15 @@ map <Leader>cc :TComment<CR>
 
 " FZF - search for files with Ctrl P
 nnoremap <C-p> :Files<CR>
+" }}}
 
-" Command Aliases
-" ===============
+" Command Aliases ----------- {{{
 
-" Allow writing files with capital :W, since it's so easy to enter accidentally
+" Allow writing files with capital :W
 command! W w
+" }}}
 
-" Vimux (settings became pretty complex, so moved to a separate file)
-" =====
-
+" Vimux --------------------- {{{
+"
 source ~/.vim/vimux_settings.vim
+"}}}
