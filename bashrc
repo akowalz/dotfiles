@@ -18,10 +18,6 @@ alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
-# Uncomment to use fzf on commandline
-# Removed because it's a bit heavy handed for history search, for example.
-# [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
