@@ -10,10 +10,12 @@ Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-sleuth'
 Plug 'alvan/vim-closetag'
 Plug 'tomtom/tcomment_vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
+Plug 'jlanzarotta/bufexplorer'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
@@ -104,11 +106,20 @@ let g:NERDCreateDefaultMappings = 0
 highlight ALEErrorSign ctermbg=NONE ctermfg=DarkRed
 highlight ALEWarningSign ctermbg=NONE ctermfg=Yellow
 
-let g:ale_fixers = {'javascript': ['eslint'], 'ruby': ['rubocop']}
+let g:ale_fixers = {'javascript': ['eslint'], 'ruby': ['rubocop'], 'php' : 'phpcbf'}
 let g:ale_sign_error = "•"
 let g:ale_sign_warning = "-"
 let g:ale_set_highlights = 0
 let g:ale_echo_msg_format = '[%linter%]: %s'
+
+if filereadable('php-coding-standards/ActiveCampaign/ruleset.xml')
+  let g:ale_phpcs_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
+  let g:ale_php_phpcbf_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
+else
+  let g:ale_php_phpcs_standard = 'PSR2'
+  let g:ale_php_phpcbf_standard = 'PSR2'
+endif
+
 
 " Lightline
 let g:lightline = {}
@@ -140,9 +151,12 @@ let mapleader ="\<Space>"
 nnoremap \\ <NOP>
 
 " Insert mode mappings
-" Exit insert mode with jk, no more escape for you.
+" Exit insert mode with jk.
 inoremap jk <ESC>
-inoremap <ESC> <NOP>
+
+" Allow moving between wrapped lines.
+nnoremap j gj
+nnoremap k gk
 
 " search for documentation in Dash for word under cursor with <Leader>da
 nnoremap <Leader>da :!open 'dash://<cword>'<CR>
@@ -174,7 +188,7 @@ nnoremap <Leader>nh :nohlsearch<CR>
 nnoremap <C-l> :nohlsearch<CR>
 
 " Clear trailing whitespace with <Leader>cw
-nnoremap <Leader>cw :%s/\s\+$//g<CR>
+nnoremap <Leader>cw :%s/\s\+$//g<CR>:nohlsearch<CR>
 
 " Change the current `test` to `test.only` with <Leader>on
 nnoremap <Leader>on ?test(<CR>ea.only<ESC>:noh<CR>

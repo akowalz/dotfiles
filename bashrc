@@ -14,9 +14,14 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -s' # run last command
 
+alias cdl='cd ~/dev/localdev'
+alias cdh='cd ~/dev/Hosted'
+
 alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
+
+ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
