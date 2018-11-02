@@ -47,6 +47,8 @@ set wildignore+=*.pyc,*.o,*.class,*.lo,.git,vendor/*,node_modules/**,bower_compo
 set mouse=
 set ttymouse=
 set foldlevelstart=99
+
+set splitright
 " }}}
 
 " Appearance ---------------- {{{
@@ -224,6 +226,22 @@ map <Leader>cc :TComment<CR>
 " FZF - search for files with Ctrl P
 nnoremap <C-p> :Files<CR>
 " }}}
+
+function! FindCorrespondingTestFile()
+  let l:filename = expand('%:t')
+
+  let l:path_and_ext = split(l:filename, '\.')
+
+  let l:path = path_and_ext[0]
+  let l:ext = path_and_ext[1]
+
+  let l:cmd = "find " . getcwd() . " -iname " . l:path . "test" . "." . l:ext
+  let l:testfile = systemlist(l:cmd)[0]
+
+  execute  "normal! :vsplit" . l:testfile . " \<CR>"
+endfunction
+
+nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
 
 " Command Aliases ----------- {{{
 
