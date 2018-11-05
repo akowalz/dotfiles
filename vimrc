@@ -235,8 +235,16 @@ function! FindCorrespondingTestFile()
   let l:path = path_and_ext[0]
   let l:ext = path_and_ext[1]
 
-  let l:cmd = "find " . getcwd() . " -iname " . l:path . "test" . "." . l:ext
-  let l:testfile = systemlist(l:cmd)[0]
+  " find -E . -iregex '.*SomeClass_?(test|spec).php'
+  let l:cmd = "find -E " . getcwd() . " -iregex " . "'.*" . l:path . "_?(test|spec)" . "." . l:ext . "'"
+  let l:testfile = systemlist(l:cmd)
+
+  if (len(l:testfile) == 0)
+    echo "No corresponding test or spec found."
+    return
+  endif
+
+  let l:testfile = l:testfile[0]
 
   execute  "normal! :vsplit" . l:testfile . " \<CR>"
 endfunction

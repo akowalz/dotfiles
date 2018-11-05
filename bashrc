@@ -9,6 +9,8 @@ alias be='bundle exec'
 
 alias dc-exec='docker-compose exec'
 
+alias tf='terraform'
+
 alias vi='vim'
 
 alias ll='ls -al'
@@ -17,11 +19,15 @@ alias l='fc -s' # run last command
 alias cdl='cd ~/dev/localdev'
 alias cdh='cd ~/dev/Hosted'
 
+# Pipe into here to format json nicely, e.g:
+# curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
 ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
+
+dsh() { docker-compose exec $1 bash; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
@@ -34,7 +40,6 @@ fi
 # Appearance
 export NO_COLOR='\[\033[0m\]'
 color256() { echo "\[\033[38;5;$1m\]"; }
-nocolor() { echo $NO_COLOR; }
 
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
@@ -45,8 +50,8 @@ if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
-export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$(nocolor)"
-export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $(nocolor)$ "
+export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$NO_COLOR"
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $NO_COLOR$ "
 
 export EDITOR=vim
 

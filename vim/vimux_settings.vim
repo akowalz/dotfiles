@@ -35,3 +35,6 @@ nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
 nnoremap <silent> <Leader>rr :VimuxPromptCommand<CR>
 nnoremap <silent> <Leader>vi :VimuxInspectRunner<CR>
 nnoremap <silent> <Leader>vz :VimuxZoomRunner<CR>
+
+" Run last run in that shell, regardless of if it was origianlly run by Vimux
+nnoremap <silent> <Leader>ll :VimuxRunCommand("clear && fc -s")<CR>
