@@ -236,7 +236,7 @@ function! FindCorrespondingTestFile()
   let l:ext = path_and_ext[1]
 
   " find -E . -iregex '.*SomeClass_?(test|spec).php'
-  let l:cmd = "find -E " . getcwd() . " -iregex " . "'.*" . l:path . "_?(test|spec)" . "." . l:ext . "'"
+  let l:cmd = "find -E . -iregex " . "'.*" . l:path . "_?(test|spec)" . "." . l:ext . "'"
   let l:testfile = systemlist(l:cmd)
 
   if (len(l:testfile) == 0)
