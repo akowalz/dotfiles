@@ -13,6 +13,10 @@
 	staged = "diff --staged"
   aa = add -A
   redo = "!git commit --amend --no-edit && git push --force-with-lease"
+  pushfix = "!git commit --fixup HEAD && git push"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  co-pr = "!sh -c 'git fetch origin pull/$1/head:pr/$1 && git checkout pr/$1'" -
 [push]
 	default = simple
+[core]
+	excludesfile = /Users/akowalczuk/.gitignore
