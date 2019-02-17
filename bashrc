@@ -19,15 +19,22 @@ alias l='fc -s' # run last command
 alias cdl='cd ~/dev/localdev'
 alias cdh='cd ~/dev/Hosted'
 
+# Default docker ps output is too wide
+alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"'
+
+
 # Pipe into here to format json nicely, e.g:
 # curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
+# Always use python three
+alias python='python3'
+
 ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
 
-dsh() { docker-compose exec $1 bash; }
+dsh() { cd ~/dev/localdev && docker-compose exec $1 bash; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
@@ -57,6 +64,7 @@ export EDITOR=vim
 
 # PATH adjustments
 export PATH=${PATH}:/usr/local/mysql/bin
+export PATH=${PATH}:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
 
 export NVM_DIR="$HOME/.nvm"

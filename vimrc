@@ -3,25 +3,25 @@ call plug#begin('~/.vim/plugged')
 
 " Navigation
 Plug 'scrooloose/nerdtree'
-
 " Tools
 Plug 'w0rp/ale'
 Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-sleuth'
 Plug 'alvan/vim-closetag'
 Plug 'tomtom/tcomment_vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
+Plug '~/dev/vim-find-test'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'mustache/vim-mustache-handlebars'
+Plug 'hdima/python-syntax'
 
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
@@ -46,9 +46,11 @@ set smartcase
 set wildignore+=*.pyc,*.o,*.class,*.lo,.git,vendor/*,node_modules/**,bower_components/**,*/build_gradle/*,*/build_intellij/*,*/build/*,*/cassandra_data/*
 set mouse=
 set ttymouse=
+set tags=./tags,tags,ctags
 set foldlevelstart=99
-
 set splitright
+set listchars=trail:_
+set list
 " }}}
 
 " Appearance ---------------- {{{
@@ -93,6 +95,14 @@ augroup filetype_vim
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
+
+
+" Automatically open quickfix window after grepping
+augroup grep_window
+  autocmd!
+  autocmd QuickFixCmdPost *grep* copen
+augroup END
+
 " }}}
 
 " Plugin Settings ----------- {{{
@@ -115,7 +125,7 @@ let g:ale_set_highlights = 0
 let g:ale_echo_msg_format = '[%linter%]: %s'
 
 if filereadable('php-coding-standards/ActiveCampaign/ruleset.xml')
-  let g:ale_phpcs_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
+  let g:ale_php_phpcs_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
   let g:ale_php_phpcbf_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
 else
   let g:ale_php_phpcs_standard = 'PSR2'
@@ -160,6 +170,9 @@ inoremap jk <ESC>
 nnoremap j gj
 nnoremap k gk
 
+" ENTER to repeat last command in normal mode
+nnoremap <CR> .
+
 " search for documentation in Dash for word under cursor with <Leader>da
 nnoremap <Leader>da :!open 'dash://<cword>'<CR>
 
@@ -177,9 +190,6 @@ nnoremap <Leader>pp :set paste!<CR>
 
 " Go back to the previous file with C-e
 nnoremap <C-e> :e#<CR>
-
-" Join lines without extra space with K
-nnoremap K Jx<ESC>
 
 " Indent whole file while preserving cursor location with <Leader>i or <Leader>=
 nnoremap <Leader>i m'gg=G`'
@@ -225,39 +235,14 @@ map <Leader>cc :TComment<CR>
 
 " FZF - search for files with Ctrl P
 nnoremap <C-p> :Files<CR>
+
+"Fugitive
+" <Leader>gg to search for the word under the cursor with Ggrep
+nnoremap <Leader>gg :Ggrep <cword><CR>
 " }}}
-
-function! FindCorrespondingTestFile()
-  let l:filename = expand('%:t')
-
-  let l:path_and_ext = split(l:filename, '\.')
-
-  let l:path = path_and_ext[0]
-  let l:ext = path_and_ext[1]
-
-  " find -E . -iregex '.*SomeClass_?(test|spec).php'
-  let l:cmd = "find -E . -iregex " . "'.*" . l:path . "_?(test|spec)" . "." . l:ext . "'"
-  let l:testfile = systemlist(l:cmd)
-
-  if (len(l:testfile) == 0)
-    echo "No corresponding test or spec found."
-    return
-  endif
-
-  let l:testfile = l:testfile[0]
-
-  execute  "normal! :vsplit" . l:testfile . " \<CR>"
-endfunction
 
 nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
 
-" Command Aliases ----------- {{{
-
-" Allow writing files with capital :W
-command! W w
-" }}}
-
 " Vimux --------------------- {{{
-"
 source ~/.vim/vimux_settings.vim
 "}}}

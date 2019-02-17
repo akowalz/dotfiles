@@ -21,6 +21,7 @@ symlink bashrc
 symlink bash_profile
 
 symlink gitconfig
+symlink gitignore
 symlink git-prompt-colors.sh
 
 symlink tmux.conf
