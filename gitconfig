@@ -4,6 +4,7 @@
 [alias]
 	co = checkout
 	br = branch
+	bs = branch-select
 	ci = commit
 	st = status
   rb = rebase

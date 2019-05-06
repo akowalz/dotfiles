@@ -72,4 +72,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Set docker machine environment
+[[ `docker-machine status` = “Stopped” ]] && echo “\nThe Docker virtual machine is not running.\nAttemping to start the VM. This should take about a minute.\n” && docker-machine start
 eval `docker-machine env`
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"

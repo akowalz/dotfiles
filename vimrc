@@ -170,9 +170,6 @@ inoremap jk <ESC>
 nnoremap j gj
 nnoremap k gk
 
-" ENTER to repeat last command in normal mode
-nnoremap <CR> .
-
 " search for documentation in Dash for word under cursor with <Leader>da
 nnoremap <Leader>da :!open 'dash://<cword>'<CR>
 
