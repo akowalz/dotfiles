@@ -1,8 +1,9 @@
 # Aliases
 alias g='git'
 alias gd='git diff'
-alias gst='git status'
+alias gs='git status'
 alias gl='git log'
+alias gp='git pull'
 
 alias bi='bundle install'
 alias be='bundle exec'
@@ -22,7 +23,6 @@ alias cdh='cd ~/dev/Hosted'
 # Default docker ps output is too wide
 alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"'
 
-
 # Pipe into here to format json nicely, e.g:
 # curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
@@ -35,6 +35,7 @@ alias python='python3'
 ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
 
 dsh() { cd ~/dev/localdev && docker-compose exec $1 bash; }
+dce() { cd ~/dev/localdev && docker-compose exec $1; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
