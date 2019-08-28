@@ -17,8 +17,11 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -s' # run last command
 
+# aliases for common ac folders
 alias cdl='cd ~/dev/localdev'
 alias cdh='cd ~/dev/Hosted'
+alias cdd='cd ~/dev/deepdata'
+alias cde='cd ~/dev/ember-app'
 
 # Default docker ps output is too wide
 alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"'
@@ -31,6 +34,12 @@ alias weather='curl wttr.in/chicago'
 
 # Always use python three
 alias python='python3'
+
+reload() {
+  source ~/.bashrc;
+  eval `docker-machine env`;
+  echo 'Done.'
+}
 
 ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
 
