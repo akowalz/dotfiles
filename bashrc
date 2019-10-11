@@ -18,12 +18,6 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -s' # run last command
 
-# aliases for common ac folders
-alias cdl='cd ~/dev/localdev'
-alias cdh='cd ~/dev/Hosted'
-alias cdd='cd ~/dev/deepdata'
-alias cde='cd ~/dev/ember-app'
-
 # Default docker ps output is too wide
 alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"'
 
@@ -38,14 +32,10 @@ alias python='python3'
 
 reload() {
   source ~/.bashrc;
-  eval `docker-machine env`;
-  echo 'Done.'
+  echo 'Done.';
 }
 
 ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
-
-dsh() { cd ~/dev/localdev && docker-compose exec $1 bash; }
-dce() { cd ~/dev/localdev && docker-compose exec $1; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
@@ -90,3 +80,5 @@ export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
+
+source bashrc_ac.sh
