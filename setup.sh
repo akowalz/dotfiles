@@ -32,4 +32,6 @@ symlink vimrc
 echo "Installing vim plugins."
 vim +PlugInstall +qall
 
+echo "tmux plugins must be installed manually!"
+
 echo "Done."
