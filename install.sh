@@ -21,6 +21,14 @@ else
   echo "Already installed."
 fi
 
+echo "Checking for tmux plugin manager"
+if [ -d ~/.tmux/plugins/tpm ]; then
+  echo "Already installed."
+else
+  echo "Installing tmux plugin manager"
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
+
 echo "Checking for bash-git-prompt..."
 if ! brew list bash-git-prompt &> /dev/null; then
   echo "Installing bash-git-prompt via homebrew."

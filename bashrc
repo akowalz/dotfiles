@@ -9,6 +9,7 @@ alias bi='bundle install'
 alias be='bundle exec'
 
 alias dc-exec='docker-compose exec'
+alias dc='docker-compose'
 
 alias tf='terraform'
 
@@ -84,6 +85,8 @@ export NVM_DIR="$HOME/.nvm"
 # Set docker machine environment
 [[ `docker-machine status` = “Stopped” ]] && echo “\nThe Docker virtual machine is not running.\nAttemping to start the VM. This should take about a minute.\n” && docker-machine start
 eval `docker-machine env`
+
+export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"

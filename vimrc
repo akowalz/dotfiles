@@ -227,8 +227,8 @@ nnoremap <Leader>nf :NERDTreeFind<CR>
 " ALE
 nnoremap <Leader>af :ALEFix<CR>
 
-" TComment leader cc to toggle comments
-map <Leader>cc :TComment<CR>
+" Toggle commenting with Ctrl-\
+map <C-\> :TComment<CR>
 
 " FZF - search for files with Ctrl P
 nnoremap <C-p> :Files<CR>

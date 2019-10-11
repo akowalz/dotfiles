@@ -14,12 +14,12 @@
   fixup = commit --fixup HEAD
   staged = "diff --staged"
   aa = add -A
-  redo = "!git amend && git push --force-with-lease"
+  redo = "!git add . && git amend && git push --force-with-lease"
   pushfix = "!git commit --fixup HEAD && git push"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
   pf = push --force-with-lease
   co-pr = "!sh -c 'git fetch origin pull/$1/head:pr/$1 && git checkout pr/$1'" -
-  copy = "!sh -c 'git rev-parse HEAD | pbcopy'"
+  copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   sync = "!sh -c 'git checkout $1 && git pull && git checkout - && git rebase develop'" -
   branch-name=rev-parse --abbrev-ref HEAD
   deploy-to-qa="!sh -c 'git push origin $(git rev-parse HEAD):feature/qa/akowalz --force'"
