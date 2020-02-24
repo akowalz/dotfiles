@@ -27,15 +27,10 @@ alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
-# Always use python three
-alias python='python3'
-
 reload() {
   source ~/.bashrc;
   echo 'Done.';
 }
-
-ac-clone() { git clone git@github.com:ActiveCampaign/$1.git; }
 
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
@@ -68,11 +63,17 @@ export PATH=${PATH}:/usr/local/mysql/bin
 export PATH=${PATH}:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
 
+# Post install steps of `brew install nvm`
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
 
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
+# Hide annoying warning to use zsh on Catalina
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
+# Load rbenv
+eval "$(rbenv init -)"
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"

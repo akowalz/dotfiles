@@ -1,0 +1,7 @@
+source ~/.vimrc
+
+map <Space>w :action SaveAll<CR>
+map <Space>= :action ReformatCode<CR>
+
+map <Space>nt :action ActivateProjectToolWindow<CR>
+map <Space>nt :action SelectIn<CR>

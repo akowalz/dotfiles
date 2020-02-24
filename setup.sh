@@ -28,6 +28,7 @@ symlink tmux.conf
 
 symlink vim
 symlink vimrc
+symlink ideavimrc
 
 echo "Installing vim plugins."
 vim +PlugInstall +qall
