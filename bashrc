@@ -72,13 +72,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Set docker machine environment
-[[ `docker-machine status` = “Stopped” ]] && echo “\nThe Docker virtual machine is not running.\nAttemping to start the VM. This should take about a minute.\n” && docker-machine start
-eval `docker-machine env`
-
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
-
-source bashrc_ac.sh
