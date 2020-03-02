@@ -1,6 +1,6 @@
 [user]
   name = Alex Kowalczuk
-  email = akowalczuk@activecampaign.com
+  email = alex@tegus.co
 [alias]
   co = checkout
   br = branch
@@ -9,24 +9,22 @@
   st = status
   rb = rebase
   ap = add --patch
+  pf = push --force-with-lease
   pile = stash --include-untracked
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
   aa = add -A
+  pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  sync = "!git checkout master && git pull && git checkout - && git rebase master"
   redo = "!git add . && git amend && git push --force-with-lease"
   pushfix = "!git commit --fixup HEAD && git push"
-  pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
-  pf = push --force-with-lease
-  co-pr = "!sh -c 'git fetch origin pull/$1/head:pr/$1 && git checkout pr/$1'" -
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
-  sync = "!sh -c 'git checkout $1 && git pull && git checkout - && git rebase develop'" -
   branch-name=rev-parse --abbrev-ref HEAD
-  deploy-to-qa="!sh -c 'git push origin $(git rev-parse HEAD):feature/qa/akowalz --force'"
   kick = "!sh -c 'git commit --allow-empty -m \"Kick the build\" && git push'"
 [push]
   default = simple
 [push]
   default = simple
 [core]
-  excludesfile = /Users/akowalczuk/.gitignore
+  excludesfile = /Users/alexkowalczuk/.gitignore

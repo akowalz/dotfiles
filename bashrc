@@ -77,3 +77,5 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 eval "$(rbenv init -)"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+source "$HOME/dotfiles/tegus_bashrc.sh"

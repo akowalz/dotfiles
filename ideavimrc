@@ -1,7 +1,13 @@
-source ~/.vimrc
+source ~/.
 
 map <Space>w :action SaveAll<CR>
 map <Space>= :action ReformatCode<CR>
+map <Space>ee :action ShowErrorDescription<CR>
 
 map <Space>nt :action ActivateProjectToolWindow<CR>
-map <Space>nt :action SelectIn<CR>
+map <Space>nf :action SelectIn<CR>
+
+map <Space>rf :action RunContextGroup<CR><CR>
+map <Space>rl :action Rerun<CR>
+
+map <Space>gb :action Annotate<CR>

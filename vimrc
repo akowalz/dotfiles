@@ -14,7 +14,6 @@ Plug 'tomtom/tcomment_vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
-Plug '~/dev/vim-find-test'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
@@ -22,6 +21,8 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'mustache/vim-mustache-handlebars'
 Plug 'hdima/python-syntax'
+Plug 'posva/vim-vue'
+Plug 'leafgarland/typescript-vim'
 
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
@@ -91,6 +92,12 @@ augroup filetype_for_js_snap_file
   autocmd BufNewFile,BufRead *.js.snap set filetype=javascript.jsx
 augroup END
 
+" Set filetype to dosini for gitconfig file
+augroup filetype_for_js_snap_file
+  autocmd!
+  autocmd BufNewFile,BufRead *gitconfig set filetype=dosini
+augroup END
+
 augroup filetype_vim
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
@@ -123,15 +130,6 @@ let g:ale_sign_error = "•"
 let g:ale_sign_warning = "-"
 let g:ale_set_highlights = 0
 let g:ale_echo_msg_format = '[%linter%]: %s'
-
-if filereadable('php-coding-standards/ActiveCampaign/ruleset.xml')
-  let g:ale_php_phpcs_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
-  let g:ale_php_phpcbf_standard='php-coding-standards/ActiveCampaign/ruleset.xml'
-else
-  let g:ale_php_phpcs_standard = 'PSR2'
-  let g:ale_php_phpcbf_standard = 'PSR2'
-endif
-
 
 " Lightline
 let g:lightline = {}
@@ -175,6 +173,9 @@ nnoremap <Leader>da :!open 'dash://<cword>'<CR>
 
 " Ctrl-l in insert mode to insert a hash rocket
 inoremap <C-L> <SPACE>=><SPACE>
+
+" Ctrl-f in insert mode to insert an empty arrow function
+inoremap <C-F> <Space>()<SPACE>=><SPACE>{
 
 " Write with <Leader>w
 nnoremap <Leader>w :write<CR>
@@ -237,8 +238,6 @@ nnoremap <C-p> :Files<CR>
 " <Leader>gg to search for the word under the cursor with Ggrep
 nnoremap <Leader>gg :Ggrep <cword><CR>
 " }}}
-
-nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
 
 " Vimux --------------------- {{{
 source ~/.vim/vimux_settings.vim

@@ -17,16 +17,20 @@ function! FocusedTestSpecifier()
   return "VIMUX_FOCUSED_TEST_SPECIFIER"
 endfunction
 
+function! PostRunCommand()
+  return ""
+endfunction
+
 function! RunBuffer()
-  return TestRunner() . " " . CurrentBufferSpecifier()
+  return TestRunner() . " " . CurrentBufferSpecifier() . " " . PostRunCommand()
 endfunction
 
 function! RunFocused()
-  return TestRunner() . " " . CurrentBufferSpecifier() . FocusedTestSpecifier()
+  return TestRunner() . " " . CurrentBufferSpecifier() . FocusedTestSpecifier() . " " . PostRunCommand()
 endfunction
 
 function! ClearAndEcho(cmd)
-  return "clear && echo " . a:cmd . " && " . a:cmd
+  return "clear && echo '" . a:cmd . "' && " . "(" . a:cmd . ")"
 endfunction
 
 nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
