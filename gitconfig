@@ -14,6 +14,7 @@
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
+  skip = push -o ci.skip
   aa = add -A
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
   sync = "!git checkout master && git pull && git checkout - && git rebase master"

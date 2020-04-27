@@ -175,7 +175,7 @@ nnoremap <Leader>da :!open 'dash://<cword>'<CR>
 inoremap <C-L> <SPACE>=><SPACE>
 
 " Ctrl-f in insert mode to insert an empty arrow function
-inoremap <C-F> <Space>()<SPACE>=><SPACE>{
+inoremap <C-F> ()<SPACE>=><SPACE>{
 
 " Write with <Leader>w
 nnoremap <Leader>w :write<CR>
@@ -193,9 +193,8 @@ nnoremap <C-e> :e#<CR>
 nnoremap <Leader>i m'gg=G`'
 nnoremap <Leader>= m'gg=G`'
 
-" Clear search highlighting with <Leader>nh or Ctrl-l
-nnoremap <Leader>nh :nohlsearch<CR>
-nnoremap <C-l> :nohlsearch<CR>
+" Clear search highlighting with or Ctrl-l
+nnoremap <C-l> :let @/ = ""<CR>
 
 " Clear trailing whitespace with <Leader>cw
 nnoremap <Leader>cw :%s/\s\+$//g<CR>:nohlsearch<CR>
@@ -218,6 +217,12 @@ nnoremap <Leader>ff za
 " Source vimrc with <Leader>vc
 nnoremap <Leader>vc :source ~/.vimrc<CR>:echo "Reloaded .vimrc"<CR>
 
+" Rebuild ctags with <Leader>ct
+nnoremap <Leader>ct :!ctags -R .<CR>:echo 'Rebuilt ctags'<CR>
+
+" Jump to ctag with <C-enter>
+nnoremap <C-CR> <C-]>
+
 " Plugin Command Mappings
 
 " Nerdtree mappings
@@ -238,6 +243,8 @@ nnoremap <C-p> :Files<CR>
 " <Leader>gg to search for the word under the cursor with Ggrep
 nnoremap <Leader>gg :Ggrep <cword><CR>
 " }}}
+
+nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
 
 " Vimux --------------------- {{{
 source ~/.vim/vimux_settings.vim

@@ -38,6 +38,8 @@ if [ -f ~/.git-completion.bash ]; then
 
   # Alias g='git' for autocompletion
   __git_complete g __git_main
+else 
+  echo 'Git bash completion not installed, run install.sh'
 fi
 
 # Appearance
@@ -62,6 +64,7 @@ export EDITOR=vim
 export PATH=${PATH}:/usr/local/mysql/bin
 export PATH=${PATH}:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
+export PATH=/usr/local/bin:$PATH
 
 # Post install steps of `brew install nvm`
 export NVM_DIR="$HOME/.nvm"

@@ -23,5 +23,9 @@ else
   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
+echo "Installing git bash completion script"
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash \
+  -o ~/.git-completion.bash
+
 echo "Done."
 echo "Run the setup script to configure these utilites."
