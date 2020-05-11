@@ -2,6 +2,7 @@
   name = Alex Kowalczuk
   email = alex@tegus.co
 [alias]
+  aa = add -A
   co = checkout
   br = branch
   bs = branch-select
@@ -10,19 +11,17 @@
   rb = rebase
   ap = add --patch
   pf = push --force-with-lease
+  pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
   pile = stash --include-untracked
+  sync = "!git checkout master && git pull && git checkout - && git rebase master"
+  redo = "!git add . && git amend && git push --force-with-lease"
+  skip = push -o ci.skip
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
-  skip = push -o ci.skip
-  aa = add -A
-  pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
-  sync = "!git checkout master && git pull && git checkout - && git rebase master"
-  redo = "!git add . && git amend && git push --force-with-lease"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   branch-name=rev-parse --abbrev-ref HEAD
-  kick = "!sh -c 'git commit --allow-empty -m \"Kick the build\" && git push'"
 [push]
   default = simple
 [push]
