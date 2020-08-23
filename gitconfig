@@ -5,13 +5,14 @@
   aa = add -A
   co = checkout
   br = branch
-  bs = branch-select
+  bs = branch-select # npm install --global git-branch-select
   ci = commit
   st = status
   rb = rebase
   ap = add --patch
   pf = push --force-with-lease
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  rbi = rebase --interactive
   pile = stash --include-untracked
   sync = "!git checkout master && git pull && git checkout - && git rebase master"
   redo = "!git add . && git amend && git push --force-with-lease"
@@ -21,10 +22,9 @@
   staged = "diff --staged"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
+  reset-file= "!sh -c 'git checkout origin/master $1'"
   branch-name=rev-parse --abbrev-ref HEAD
-[push]
-  default = simple
-[push]
-  default = simple
+  nuke-branches="!sh -c 'git branch | grep -v "master" | xargs git branch -D'"
+  reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
 [core]
   excludesfile = /Users/alexkowalczuk/.gitignore

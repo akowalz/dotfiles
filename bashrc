@@ -3,7 +3,7 @@ alias g='git'
 alias gd='git diff'
 alias gs='git status'
 alias gl='git log'
-alias gp='git pull'
+alias gp='git pull && git pull'
 
 alias bi='bundle install'
 alias be='bundle exec'
