@@ -12,7 +12,9 @@
   ap = add --patch
   pf = push --force-with-lease
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  pbr = pull --rebase
   rbi = rebase --interactive
+  rbm = rebase --interactive master
   pile = stash --include-untracked
   sync = "!git checkout master && git pull && git checkout - && git rebase master"
   redo = "!git add . && git amend && git push --force-with-lease"
