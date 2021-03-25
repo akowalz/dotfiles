@@ -6,12 +6,15 @@
   co = checkout
   br = branch
   bs = branch-select # npm install --global git-branch-select
+  cp = cherry-pick
   ci = commit
   st = status
   rb = rebase
   ap = add --patch
   pf = push --force-with-lease
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  mr = "!open https://gitlab.com/tegus/tegus/-/merge_requests/new?merge_request%5Bsource_branch%5D=$(git rev-parse --abbrev-ref HEAD)"
+  pumr = "!git pu && git mr"
   pbr = pull --rebase
   rbi = rebase --interactive
   rbm = rebase --interactive master
@@ -19,6 +22,7 @@
   sync = "!git checkout master && git pull && git checkout - && git rebase master"
   redo = "!git add . && git amend && git push --force-with-lease"
   skip = push -o ci.skip
+  edit = commit --amend
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
