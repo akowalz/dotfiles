@@ -14,6 +14,7 @@ Plug 'tomtom/tcomment_vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
+Plug 'tpope/vim-projectionist'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
@@ -168,9 +169,6 @@ inoremap jk <ESC>
 nnoremap j gj
 nnoremap k gk
 
-" search for documentation in Dash for word under cursor with <Leader>da
-nnoremap <Leader>da :!open 'dash://<cword>'<CR>
-
 " Ctrl-l in insert mode to insert a hash rocket
 inoremap <C-L> <SPACE>=><SPACE>
 
@@ -245,6 +243,13 @@ nnoremap <Leader>gg :Ggrep <cword><CR>
 " }}}
 
 nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
+
+" Markdown and deskset mappings
+" New slide
+nnoremap <Leader>ns o<CR>---<CR><CR><ESC>
+
+" New code fence
+nnoremap <Leader>cf o<CR>```<CR>```<ESC>O
 
 " Vimux --------------------- {{{
 source ~/.vim/vimux_settings.vim
