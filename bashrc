@@ -56,15 +56,19 @@ if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
 fi
 
 export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$NO_COLOR"
-export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $NO_COLOR$ "
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $NO_COLOR\n$ "
 
 export EDITOR=vim
 
-# PATH adjustments
-export PATH=${PATH}:/usr/local/mysql/bin
-export PATH=${PATH}:~/.composer/vendor/bin
+# Hide annoying warning to use zsh on Catalina
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
+# Tool configs and path adjustments (some of these may not be very cross-platform)
+export PATH=$PATH:/usr/local/mysql/bin
+export PATH=$PATH:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
+export PATH=$HOME/.poetry/bin:$PATH
 
 # Post install steps of `brew install nvm`
 export NVM_DIR="$HOME/.nvm"
@@ -73,12 +77,20 @@ export NVM_DIR="$HOME/.nvm"
 
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
-# Hide annoying warning to use zsh on Catalina
-export BASH_SILENCE_DEPRECATION_WARNING=1
-
-# Load rbenv
-eval "$(rbenv init -)"
-
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
-source "$HOME/dotfiles/tegus_bashrc.sh"
+# Load rbenv
+if command -v rbenv 1>/dev/null 2>&1; then
+  eval "$(rbenv init -)"
+fi
+
+# Load pyenv
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv virtualenv-init -)"
+fi
+
+if [[ -f "$HOME/dotfiles/tegus_bashrc.sh" ]]; then
+  source "$HOME/dotfiles/tegus_bashrc.sh"
+fi
