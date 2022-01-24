@@ -17,9 +17,10 @@
   pumr = "!git pu && git mr"
   pbr = pull --rebase
   rbi = rebase --interactive
-  rbm = rebase --interactive master
+  rbm = rebase --interactive main
+  rbc = rebase --continue
   pile = stash --include-untracked
-  sync = "!git checkout master && git pull && git checkout - && git rebase master"
+  sync = "!git checkout main && git pull && git checkout - && git rebase main"
   redo = "!git add . && git amend && git push --force-with-lease"
   skip = push -o ci.skip
   edit = commit --amend
@@ -28,9 +29,9 @@
   staged = "diff --staged"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
-  reset-file= "!sh -c 'git checkout origin/master $1'"
+  reset-file= "!sh -c 'git checkout origin/main $1'"
   branch-name=rev-parse --abbrev-ref HEAD
-  nuke-branches="!sh -c 'git branch | grep -v "master" | xargs git branch -D'"
+  nuke-branches="!sh -c 'git branch | grep -v "main" | xargs git branch -D'"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
 [core]
   excludesfile = /Users/alexkowalczuk/.gitignore
