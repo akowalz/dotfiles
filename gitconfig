@@ -11,16 +11,16 @@
   st = status
   rb = rebase
   ap = add --patch
-  pf = push --force-with-lease
+  pf = "!if [[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]]; then echo 'No changes, silly'; else git push --force; fi"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
   mr = "!open https://gitlab.com/tegus/tegus/-/merge_requests/new?merge_request%5Bsource_branch%5D=$(git rev-parse --abbrev-ref HEAD)"
   pumr = "!git pu && git mr"
   pbr = pull --rebase
   rbi = rebase --interactive
-  rbm = rebase --interactive main
+  rbm = "!git rebase --interactive $(git default-branch)"
   rbc = rebase --continue
   pile = stash --include-untracked
-  sync = "!git checkout main && git pull && git checkout - && git rebase main"
+  sync = "!git checkout $(git default-branch) && git pull && git checkout - && git rebase $(git default-branch)"
   redo = "!git add . && git amend && git push --force-with-lease"
   skip = push -o ci.skip
   edit = commit --amend
@@ -29,9 +29,9 @@
   staged = "diff --staged"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
-  reset-file= "!sh -c 'git checkout origin/main $1'"
+  reset-file= "!sh -c 'git checkout $(git default-branch) $1'"
   branch-name=rev-parse --abbrev-ref HEAD
-  nuke-branches="!sh -c 'git branch | grep -v "main" | xargs git branch -D'"
+  default-branch="!git rev-parse --abbrev-ref origin/HEAD | cut -c8-"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
 [core]
   excludesfile = /Users/alexkowalczuk/.gitignore

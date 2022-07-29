@@ -19,7 +19,7 @@ alias ll='ls -al'
 alias l='fc -s' # run last command
 
 # Default docker ps output is too wide
-alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"'
+alias dps='docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"'
 
 # Pipe into here to format json nicely, e.g:
 # curl http://api.com/endpoint.json | j
@@ -70,14 +70,14 @@ export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=$HOME/.poetry/bin:$PATH
 
+export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
 # Post install steps of `brew install nvm`
 export NVM_DIR="$HOME/.nvm"
 [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
 [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
-
-export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
-
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Load rbenv
 if command -v rbenv 1>/dev/null 2>&1; then
