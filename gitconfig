@@ -31,7 +31,7 @@
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   reset-file= "!sh -c 'git checkout $(git default-branch) $1'"
   branch-name=rev-parse --abbrev-ref HEAD
-  default-branch="!git rev-parse --abbrev-ref origin/HEAD | cut -c8-"
+  default-branch="!git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
 [core]
   excludesfile = /Users/alexkowalczuk/.gitignore
