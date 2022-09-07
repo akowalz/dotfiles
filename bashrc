@@ -1,3 +1,5 @@
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Aliases
 alias g='git'
 alias gd='git diff'
