@@ -36,3 +36,13 @@ vim +PlugInstall +qall
 echo "tmux plugins must be installed manually!"
 
 echo "Done."
+
+echo "Running mac defaults commands"
+defaults write -g ApplePressAndHoldEnabled -bool false
+
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0.2
+defaults write com.apple.screencapture type jpg
+defaults write com.apple.Dock showhidden -bool TRUE
+
+echo "Log out and back in order for changes to take effect"
