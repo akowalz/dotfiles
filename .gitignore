@@ -1,1 +1,4 @@
-/Users/alex/.gitignore
+vim/plugged
+vim/.netrwhist
+tegus_bashrc.sh
+tegus/
