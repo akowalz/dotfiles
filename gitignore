@@ -1,8 +1,0 @@
-tags
-ctags
-*.swp
-*.iml
-*.generators
-*.rakeTasks
-*.ruby-gemset
-.ruby-gemset
