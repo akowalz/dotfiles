@@ -1,11 +1,43 @@
 [user]
   name = Alex Kowalczuk
   email = alex@tegus.co
+[column]
+  ui = auto
+[branch]
+  sort = -committerdate
+[core]
+  excludesfile = /Users/alexkowalczuk/.gitignore
+[pull]
+  rebase = true
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
+[push]
+  default = simple
+  autoSetupRemote = true
+  followTags = true
+[fetch]
+  prune = true
+  pruneTags = true
+  all = true
+[help]
+  autocorrect = prompt
+[rerere]
+  enabled = true
+  autoupdate = true
+[rebase]
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
+[merge]
+  conflictStyle = zdiff3
 [alias]
   aa = add -A
   co = checkout
   br = branch
-  bs = branch-select # npm install --global git-branch-select
+  bs = select
   cp = cherry-pick
   ci = commit
   st = status
@@ -13,12 +45,13 @@
   ap = add --patch
   pf = "!if [[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]]; then echo 'No changes, silly'; else git push --force; fi"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
-  mr = "!open https://gitlab.com/tegus/tegus/-/merge_requests/new?merge_request%5Bsource_branch%5D=$(git rev-parse --abbrev-ref HEAD)"
-  pumr = "!git pu && git mr"
+  mr = "!url=$(git config custom.mr-url)$(git rev-parse --abbrev-ref HEAD) && echo $url | pbcopy && echo $url && open $url"
+  sel = select
   pbr = pull --rebase
-  rbi = rebase --interactive
-  rbm = "!git rebase --interactive $(git default-branch)"
+  rbi = "!git rebase --interactive $(git merge-base HEAD $(git default-branch))"
+  rbm = "!git fetch origin $(git default-branch):$(git default-branch) && git rebase --interactive $(git default-branch)"
   rbc = rebase --continue
+  pumr = "!git pu && git mr"
   pile = stash --include-untracked
   sync = "!git checkout $(git default-branch) && git pull && git checkout - && git rebase $(git default-branch)"
   redo = "!git add . && git amend && git push --force-with-lease"
@@ -27,11 +60,10 @@
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
+  select = "!git checkout $(git branch --list --sort=-committerdate | fzf | tr -d ‘[:space:]’ | tr -d '*' )"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   reset-file= "!sh -c 'git checkout $(git default-branch) $1'"
   branch-name=rev-parse --abbrev-ref HEAD
   default-branch="!git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
-[core]
-  excludesfile = /Users/alexkowalczuk/.gitignore
