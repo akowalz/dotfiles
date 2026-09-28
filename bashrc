@@ -66,8 +66,6 @@ export EDITOR=vim
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Tool configs and path adjustments (some of these may not be very cross-platform)
-export PATH=$PATH:/usr/local/mysql/bin
-export PATH=$PATH:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=$HOME/.poetry/bin:$PATH
