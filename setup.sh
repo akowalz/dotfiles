@@ -1,5 +1,9 @@
 #!/bin/bash
 
+realpath() {
+  [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 symlink () {
   dest=~/.$1
   echo "Setting up $1"
