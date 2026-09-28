@@ -90,3 +90,13 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init --path)"
   eval "$(pyenv virtualenv-init -)"
 fi
+
+. "$HOME/.local/bin/env"
+eval "$(uv generate-shell-completion bash)"
+
+# direnv
+eval "$(direnv hook bash)"
+
+# bun (installed per-user in ~/.bun)
+export BUN_INSTALL="$HOME/.bun"
+[ -d "$BUN_INSTALL/bin" ] && export PATH="$BUN_INSTALL/bin:$PATH"
