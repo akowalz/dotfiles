@@ -6,3 +6,4 @@ ctags
 *.rakeTasks
 
 **/.claude/settings.local.json
+**/.claude/worktrees/
