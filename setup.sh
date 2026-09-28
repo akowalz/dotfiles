@@ -34,6 +34,15 @@ symlink vim
 symlink vimrc
 symlink ideavimrc
 
+if [ -e ~/bin ]
+then
+  echo "~/bin already exists, skipping."
+else
+  echo "Linking bin to ~/bin"
+  ln -fs $(realpath bin) ~/bin
+fi
+printf "\n"
+
 echo "Installing vim plugins."
 vim +PlugInstall +qall
 
