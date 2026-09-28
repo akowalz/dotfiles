@@ -68,28 +68,10 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # Tool configs and path adjustments (some of these may not be very cross-platform)
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
-export PATH=$HOME/.poetry/bin:$PATH
 
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
-# Post install steps of `brew install nvm`
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-
-# Load rbenv
-if command -v rbenv 1>/dev/null 2>&1; then
-  eval "$(rbenv init -)"
-fi
-
-# Load pyenv
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-  eval "$(pyenv init --path)"
-  eval "$(pyenv virtualenv-init -)"
-fi
 
 . "$HOME/.local/bin/env"
 eval "$(uv generate-shell-completion bash)"
