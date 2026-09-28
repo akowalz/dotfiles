@@ -45,7 +45,7 @@ else
 fi
 
 # Appearance
-export NO_COLOR='\[\033[0m\]'
+export END_COLOR='\[\033[0m\]'
 color256() { echo "\[\033[38;5;$1m\]"; }
 
 export CLICOLOR=1
@@ -57,8 +57,8 @@ if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
-export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$NO_COLOR"
-export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $NO_COLOR\n$ "
+export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$END_COLOR"
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $END_COLOR\n$ "
 
 export EDITOR=vim
 
