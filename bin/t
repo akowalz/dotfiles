@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+#
+# t - describe a shell command in plain English, have Claude write it, then run it.
+#
+#   t list the files in this dir by increasing size
+#   t -y fetch the raw html from google.com     # skip confirmation
+#
+# Model can be overridden with T_MODEL (default: haiku).
+
+set -o pipefail
+
+usage() {
+  echo "usage: t [-y] <description of what you want to do>" >&2
+  exit 1
+}
+
+confirm=1
+if [ "$1" = "-y" ]; then
+  confirm=0
+  shift
+fi
+[ $# -eq 0 ] && usage
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "t: claude CLI not found on PATH" >&2
+  exit 1
+fi
+
+system_prompt="You translate a plain-English request into a single shell command.
+Environment: $(uname -sm), shell: bash, working directory: $PWD.
+Reply with ONLY the command, on one line, with no explanation, no markdown and no code fences.
+Chain with && or | if several steps are needed. Prefer tools that ship with the OS.
+If the request cannot be done safely as a command, reply with: echo \"<short reason>\""
+
+cmd=$(claude -p --model "${T_MODEL:-haiku}" --tools "" \
+  --system-prompt "$system_prompt" "$*" 2>&1)
+status=$?
+if [ $status -ne 0 ] || [ -z "$cmd" ]; then
+  echo "t: claude failed: $cmd" >&2
+  exit 1
+fi
+
+# Strip any stray code fences / surrounding whitespace.
+cmd=$(printf '%s\n' "$cmd" | sed -e '/^```/d' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+printf '\033[1;36m$ %s\033[0m\n' "$cmd" >&2
+
+if [ $confirm -eq 1 ]; then
+  printf 'Run? [Y/n/e(dit)] ' >&2
+  read -r answer </dev/tty
+  case "$answer" in
+    ""|y|Y) ;;
+    e|E)
+      if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+        read -r -e -i "$cmd" -p '$ ' cmd </dev/tty
+      else
+        read -r -e -p '$ ' cmd </dev/tty
+      fi
+      [ -z "$cmd" ] && exit 1
+      ;;
+    *) exit 1 ;;
+  esac
+fi
+
+eval "$cmd"
