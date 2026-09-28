@@ -1,6 +1,6 @@
 [user]
   name = Alex Kowalczuk
-  email = alex@tegus.co
+  email = askowalczuk93@gmail.com
 [column]
   ui = auto
 [branch]
@@ -43,15 +43,12 @@
   st = status
   rb = rebase
   ap = add --patch
-  pf = "!if [[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))" ]]; then echo 'No changes, silly'; else git push --force; fi"
   pu = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
-  mr = "!url=$(git config custom.mr-url)$(git rev-parse --abbrev-ref HEAD) && echo $url | pbcopy && echo $url && open $url"
   sel = select
   pbr = pull --rebase
   rbi = "!git rebase --interactive $(git merge-base HEAD $(git default-branch))"
   rbm = "!git fetch origin $(git default-branch):$(git default-branch) && git rebase --interactive $(git default-branch)"
   rbc = rebase --continue
-  pumr = "!git pu && git mr"
   pile = stash --include-untracked
   sync = "!git checkout $(git default-branch) && git pull && git checkout - && git rebase $(git default-branch)"
   redo = "!git add . && git amend && git push --force-with-lease"

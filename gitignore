@@ -1,0 +1,8 @@
+tags
+ctags
+*.swp
+*.iml
+*.generators
+*.rakeTasks
+
+**/.claude/settings.local.json

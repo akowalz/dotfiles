@@ -45,7 +45,7 @@ else
 fi
 
 # Appearance
-export NO_COLOR='\[\033[0m\]'
+export END_COLOR='\[\033[0m\]'
 color256() { echo "\[\033[38;5;$1m\]"; }
 
 export CLICOLOR=1
@@ -57,8 +57,8 @@ if [ -f "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh" ]; then
   source "$(brew --prefix)/opt/bash-git-prompt/share/gitprompt.sh"
 fi
 
-export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$NO_COLOR"
-export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $NO_COLOR\n$ "
+export GIT_PROMPT_START="\[$(tput bold)\]$(color256 35)(\w)$END_COLOR"
+export GIT_PROMPT_END=" _LAST_COMMAND_INDICATOR_ $END_COLOR\n$ "
 
 export EDITOR=vim
 
@@ -66,33 +66,19 @@ export EDITOR=vim
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Tool configs and path adjustments (some of these may not be very cross-platform)
-export PATH=$PATH:/usr/local/mysql/bin
-export PATH=$PATH:~/.composer/vendor/bin
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
-export PATH=$HOME/.poetry/bin:$PATH
 
 export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
-# Post install steps of `brew install nvm`
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+. "$HOME/.local/bin/env"
+eval "$(uv generate-shell-completion bash)"
 
-# Load rbenv
-if command -v rbenv 1>/dev/null 2>&1; then
-  eval "$(rbenv init -)"
-fi
+# direnv
+eval "$(direnv hook bash)"
 
-# Load pyenv
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-  eval "$(pyenv init --path)"
-  eval "$(pyenv virtualenv-init -)"
-fi
-
-if [[ -f "$HOME/dotfiles/tegus_bashrc.sh" ]]; then
-  source "$HOME/dotfiles/tegus_bashrc.sh"
-fi
+# bun (installed per-user in ~/.bun)
+export BUN_INSTALL="$HOME/.bun"
+[ -d "$BUN_INSTALL/bin" ] && export PATH="$BUN_INSTALL/bin:$PATH"
