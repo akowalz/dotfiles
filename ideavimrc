@@ -1,23 +1,31 @@
+" Base config ------------------------------------------------------------ {{{
 source ~/.vimrc
+" }}}
 
+" IDE action mappings ---------------------------------------------------- {{{
+" Editing
 map <Space>w :action SaveAll<CR>
 map <Space>= :action ReformatCode<CR>
-
 map <Space>ee :action ShowErrorDescription<CR>
 
+" Navigation
 map <Space>nt :action ActivateProjectToolWindow<CR>
 map <Space>nf :action SelectIn<CR>
+map <Space>st :action SplitVertically<CR> :action GotoTest<CR>
+map <C-e> :action Back<CR>
+map <C-l> :noh<CR>
 
+" Running tests
 map <Space>rf :action RunContextGroup<CR>
 map <Space>rl :action Rerun<CR>
 map <Space>rb gg :action RunContextGroup<CR>
 
-map <Space>gb :action Annotate<CR>
-
+" Debugging
 map <Space>bp :action ToggleLineBreakpoint<CR>
 map <Space>db :action Debug<CR>
 
-map <C-e> :action Back<CR>
-map <C-l> :noh<CR>
+" Git
+map <Space>gb :action Annotate<CR>
+" }}}
 
-map <Space>st :action SplitVertically<CR> :action GotoTest<CR>
+" vim: set foldmethod=marker filetype=vim:

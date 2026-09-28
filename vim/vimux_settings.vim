@@ -1,3 +1,5 @@
+" Test command builders ------------------------------------------------- {{{
+" Override these per-language in vim/after/ftplugin/*.vim
 function! TestRunner()
   " define in after/ftplugin file
   if exists("b:vimux_test_runner")
@@ -32,7 +34,9 @@ endfunction
 function! ClearAndEcho(cmd)
   return "clear && echo '" . a:cmd . "' && " . "(" . a:cmd . ")"
 endfunction
+" }}}
 
+" Mappings -------------------------------------------------------------- {{{
 nnoremap <silent> <Leader>rb :call VimuxRunCommand(ClearAndEcho(RunBuffer()))<CR>
 nnoremap <silent> <Leader>rf :call VimuxRunCommand(ClearAndEcho(RunFocused()))<CR>
 nnoremap <silent> <Leader>rl :VimuxRunLastCommand<CR>
@@ -42,3 +46,4 @@ nnoremap <silent> <Leader>vz :VimuxZoomRunner<CR>
 
 " Run last run in that shell, regardless of if it was origianlly run by Vimux
 nnoremap <silent> <Leader>ll :VimuxRunCommand("clear && fc -s")<CR>
+" }}}

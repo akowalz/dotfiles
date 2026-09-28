@@ -94,16 +94,16 @@ augroup filetype_for_js_snap_file
 augroup END
 
 " Set filetype to dosini for gitconfig file
-augroup filetype_for_js_snap_file
+augroup filetype_for_gitconfig
   autocmd!
   autocmd BufNewFile,BufRead *gitconfig set filetype=dosini
 augroup END
 
+" Fold vim files on {{{ }}} markers
 augroup filetype_vim
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
-
 
 " Automatically open quickfix window after grepping
 augroup grep_window
@@ -133,7 +133,6 @@ let g:ale_set_highlights = 0
 let g:ale_echo_msg_format = '[%linter%]: %s'
 
 " Lightline
-let g:lightline = {}
 let g:lightline#ale#indicator_ok = '✔'
 
 let g:lightline = {
@@ -161,19 +160,20 @@ endfunction
 let mapleader ="\<Space>"
 nnoremap \\ <NOP>
 
-" Insert mode mappings
+" Insert mode -------------------------------------------------------------
 " Exit insert mode with jk.
 inoremap jk <ESC>
-
-" Allow moving between wrapped lines.
-nnoremap j gj
-nnoremap k gk
 
 " Ctrl-l in insert mode to insert a hash rocket
 inoremap <C-L> <SPACE>=><SPACE>
 
 " Ctrl-f in insert mode to insert an empty arrow function
 inoremap <C-F> ()<SPACE>=><SPACE>{
+
+" Normal mode -------------------------------------------------------------
+" Allow moving between wrapped lines.
+nnoremap j gj
+nnoremap k gk
 
 " Write with <Leader>w
 nnoremap <Leader>w :write<CR>
@@ -221,8 +221,17 @@ nnoremap <Leader>ct :!ctags -R .<CR>:echo 'Rebuilt ctags'<CR>
 " Jump to ctag with <C-enter>
 nnoremap <C-CR> <C-]>
 
-" Plugin Command Mappings
+" NOTE: FindCorrespondingTestFile() isn't defined anywhere
+nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
 
+" Markdown and deckset ----------------------------------------------------
+" New slide
+nnoremap <Leader>ns o<CR>---<CR><CR><ESC>
+
+" New code fence
+nnoremap <Leader>cf o<CR>```<CR>```<ESC>O
+
+" Plugins -----------------------------------------------------------------
 " Nerdtree mappings
 nnoremap <Leader>nt :NERDTreeToggle<CR>
 nnoremap <Leader>nr :NERDTree<CR>
@@ -242,15 +251,6 @@ nnoremap <C-p> :Files<CR>
 nnoremap <Leader>gg :Ggrep <cword><CR>
 " }}}
 
-nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
-
-" Markdown and deskset mappings
-" New slide
-nnoremap <Leader>ns o<CR>---<CR><CR><ESC>
-
-" New code fence
-nnoremap <Leader>cf o<CR>```<CR>```<ESC>O
-
 " Vimux --------------------- {{{
 source ~/.vim/vimux_settings.vim
-"}}}
+" }}}
