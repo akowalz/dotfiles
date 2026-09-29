@@ -1,0 +1,47 @@
+#!/bin/bash
+# Cycle the tmux accent colour (@primary) through a list of themes.
+# The choice is saved to ~/.tmux-theme, which tmux.conf sources on load.
+#
+# Usage: tmux-theme [next|prev|<name>]   (default: next)
+
+themes=(
+  green:colour76
+  blue:colour39
+  purple:colour141
+  orange:colour208
+  pink:colour205
+  cyan:colour44
+  yellow:colour220
+  red:colour203
+)
+
+current=$(tmux show -gv @primary 2>/dev/null)
+count=${#themes[@]}
+
+index=0
+for i in "${!themes[@]}"; do
+  [ "${themes[$i]#*:}" = "$current" ] && index=$i
+done
+
+case "${1:-next}" in
+  next) index=$(( (index + 1) % count )) ;;
+  prev) index=$(( (index - 1 + count) % count )) ;;
+  *)
+    found=
+    for i in "${!themes[@]}"; do
+      [ "${themes[$i]%%:*}" = "$1" ] && index=$i && found=1
+    done
+    if [ -z "$found" ]; then
+      echo "Unknown theme '$1'. Options: ${themes[*]%%:*}" >&2
+      exit 1
+    fi
+    ;;
+esac
+
+name=${themes[$index]%%:*}
+colour=${themes[$index]#*:}
+
+echo "set -g @primary $colour" > ~/.tmux-theme
+tmux set -g @primary "$colour"
+tmux refresh-client -S 2>/dev/null
+tmux display-message "tmux theme: $name ($colour)" 2>/dev/null
