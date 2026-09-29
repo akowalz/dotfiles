@@ -63,3 +63,5 @@
   branch-name=rev-parse --abbrev-ref HEAD
   default-branch="!git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
+  # Print path of worktree for <branch>, creating worktree (and branch) under <repo>/.worktrees if needed. Use `gwt` to cd there.
+  wt = "!f() { name=\"$1\"; [ -n \"$name\" ] || { echo 'usage: git wt <branch>' >&2; return 1; }; root=$(dirname \"$(git rev-parse --path-format=absolute --git-common-dir)\"); dir=\"$root/.worktrees/$name\"; existing=$(git worktree list --porcelain | awk -v b=\"refs/heads/$name\" '/^worktree /{w=substr($0,10)} $0==\"branch \" b {print w}'); if [ -n \"$existing\" ]; then echo \"$existing\"; elif git show-ref --verify --quiet \"refs/heads/$name\"; then git worktree add \"$dir\" \"$name\" >&2 && echo \"$dir\"; else git worktree add -b \"$name\" \"$dir\" >&2 && echo \"$dir\"; fi; }; f"

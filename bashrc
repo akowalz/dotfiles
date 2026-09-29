@@ -29,6 +29,12 @@ alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
+# cd into worktree for branch <name>, creating both if needed (see `git wt`)
+gwt() {
+  local dir
+  dir=$(git wt "$@") && cd "$dir"
+}
+
 reload() {
   source ~/.bashrc;
   echo 'Done.';
