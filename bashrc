@@ -69,10 +69,6 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
 
-export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
-
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
 . "$HOME/.local/bin/env"
 eval "$(uv generate-shell-completion bash)"
 

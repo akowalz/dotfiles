@@ -6,7 +6,7 @@
 [branch]
   sort = -committerdate
 [core]
-  excludesfile = /Users/alexkowalczuk/.gitignore
+  excludesfile = ~/.gitignore
 [pull]
   rebase = true
 [diff]
@@ -37,7 +37,6 @@
   aa = add -A
   co = checkout
   br = branch
-  bs = select
   cp = cherry-pick
   ci = commit
   st = status
@@ -57,7 +56,7 @@
   amend = commit --amend --no-edit
   fixup = commit --fixup HEAD
   staged = "diff --staged"
-  select = "!git checkout $(git branch --list --sort=-committerdate | fzf | tr -d ‘[:space:]’ | tr -d '*' )"
+  select = "!git checkout $(git branch --list --sort=-committerdate | fzf | tr -d '[:space:]' | tr -d '*' )"
   pushfix = "!git commit --fixup HEAD && git push"
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   reset-file= "!sh -c 'git checkout $(git default-branch) $1'"

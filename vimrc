@@ -4,7 +4,6 @@ call plug#begin('~/.vim/plugged')
 " Navigation
 Plug 'scrooloose/nerdtree'
 " Tools
-Plug 'w0rp/ale'
 Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
@@ -28,7 +27,6 @@ Plug 'leafgarland/typescript-vim'
 " Colors and appearance
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
 call plug#end()
 " }}}
 
@@ -71,7 +69,7 @@ colorscheme PaperColor
 set laststatus=2
 set noshowmode " don't show -- INSERT -- because lightline does it for you
 
-" always show the sign column so ALE doesn't bump the buffer around
+" always show the sign column so the buffer doesn't shift around
 set signcolumn=yes
 
 " sign column (left bar) should display in same color as rest of vim
@@ -122,32 +120,15 @@ let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_buil
 " NERDTree
 let g:NERDCreateDefaultMappings = 0
 
-" ale
-highlight ALEErrorSign ctermbg=NONE ctermfg=DarkRed
-highlight ALEWarningSign ctermbg=NONE ctermfg=Yellow
-
-let g:ale_fixers = {'javascript': ['eslint'], 'ruby': ['rubocop'], 'php' : 'phpcbf'}
-let g:ale_sign_error = "•"
-let g:ale_sign_warning = "-"
-let g:ale_set_highlights = 0
-let g:ale_echo_msg_format = '[%linter%]: %s'
-
 " Lightline
-let g:lightline = {}
-let g:lightline#ale#indicator_ok = '✔'
-
 let g:lightline = {
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename', 'modified', 'linter_checking', 'linter_ok'] ],
+      \             [ 'readonly', 'filename', 'modified' ] ],
       \ },
       \ 'component_function': {
       \   'filename': 'LightlineFullPath',
       \ },
-      \ 'component_expand': {
-      \     'linter_checking': 'lightline#ale#checking',
-      \     'linter_ok': 'lightline#ale#ok',
-      \   },
       \ }
 
 function! LightlineFullPath()
@@ -227,9 +208,6 @@ nnoremap <C-CR> <C-]>
 nnoremap <Leader>nt :NERDTreeToggle<CR>
 nnoremap <Leader>nr :NERDTree<CR>
 nnoremap <Leader>nf :NERDTreeFind<CR>
-
-" ALE
-nnoremap <Leader>af :ALEFix<CR>
 
 " Toggle commenting with Ctrl-\
 map <C-\> :TComment<CR>
