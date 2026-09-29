@@ -34,6 +34,59 @@ reload() {
   echo 'Done.';
 }
 
+# --- Claude Code worktrees ---
+# Worktrees live at .claude/worktrees/<name> on branch worktree-<name>.
+# Each command takes the name or the branch name, and works from anywhere in the repo.
+#   wtcd <name>          cd into the worktree
+#   wthome               cd back to the main checkout
+#   wtdiff <name> [...]  diff the worktree (incl. uncommitted) against where it forked
+#   wtmerge <name> [...] merge worktree-<name> into the current branch
+
+_wt_root() {
+  local common
+  common=$(git rev-parse --path-format=absolute --git-common-dir) || return
+  dirname "$common"
+}
+
+_wt_dir() {
+  local root name
+  root=$(_wt_root) || return
+  name=${1#worktree-}
+  if [ -z "$name" ] || [ ! -d "$root/.claude/worktrees/$name" ]; then
+    echo "No worktree '$name'. Existing:" >&2
+    ls "$root/.claude/worktrees" >&2 2>/dev/null
+    return 1
+  fi
+  echo "$root/.claude/worktrees/$name"
+}
+
+wtcd() {
+  local dir
+  dir=$(_wt_dir "$1") && cd "$dir"
+}
+
+wthome() {
+  local root
+  root=$(_wt_root) && cd "$root"
+}
+
+wtdiff() {
+  local dir branch="worktree-${1#worktree-}"
+  dir=$(_wt_dir "$1") || return
+  shift
+  git -C "$dir" diff "$(git merge-base HEAD "$branch")" "$@"
+}
+
+wtmerge() {
+  local dir branch="worktree-${1#worktree-}"
+  dir=$(_wt_dir "$1") || return
+  shift
+  if [ -n "$(git -C "$dir" status --porcelain)" ]; then
+    echo "Warning: $branch has uncommitted changes that won't be merged." >&2
+  fi
+  git merge "$branch" "$@"
+}
+
 # git bash completion
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
