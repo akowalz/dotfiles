@@ -2,11 +2,11 @@
 # Open a tmux window for a project: Claude Code on the left, a shell on the right.
 # The window is named after the project directory. If it's already open, jump to it.
 #
-# Usage: proj [dir]   (default: current directory; also tries ~/<dir> and ~/dev/<dir>)
+# Usage: proj [dir]   (default: current directory; also tries ~/code/<dir> and ~/<dir>)
 # In tmux: prefix + P prompts for the directory.
 
 target=${1:-.}
-for candidate in "$target" "$HOME/$target" "$HOME/dev/$target"; do
+for candidate in "$target" "$HOME/code/$target" "$HOME/$target"; do
   if [ -d "$candidate" ]; then
     dir=$(cd "$candidate" && pwd)
     break
@@ -14,6 +14,11 @@ for candidate in "$target" "$HOME/$target" "$HOME/dev/$target"; do
 done
 
 if [ -z "$dir" ]; then
+  # From prefix + P, stderr is hidden (tmux only says "returned 1"), so show a message instead.
+  if [ -n "$TMUX" ]; then
+    tmux display-message "proj: no such directory: $target"
+    exit
+  fi
   echo "proj: no such directory: $target" >&2
   exit 1
 fi
