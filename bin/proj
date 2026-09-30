@@ -1,0 +1,37 @@
+#!/bin/bash
+# Open a tmux window for a project: Claude Code on the left, a shell on the right.
+# The window is named after the project directory. If it's already open, jump to it.
+#
+# Usage: proj [dir]   (default: current directory; also tries ~/<dir> and ~/dev/<dir>)
+# In tmux: prefix + P prompts for the directory.
+
+target=${1:-.}
+for candidate in "$target" "$HOME/$target" "$HOME/dev/$target"; do
+  if [ -d "$candidate" ]; then
+    dir=$(cd "$candidate" && pwd)
+    break
+  fi
+done
+
+if [ -z "$dir" ]; then
+  echo "proj: no such directory: $target" >&2
+  exit 1
+fi
+
+if [ -z "$TMUX" ]; then
+  echo "proj: run this inside tmux" >&2
+  exit 1
+fi
+
+name=$(basename "$dir")
+
+if tmux list-windows -F '#W' | grep -qxF "$name"; then
+  tmux select-window -t "=$name"
+  exit
+fi
+
+# Start claude via send-keys so the pane drops back to a shell when claude exits.
+claude_pane=$(tmux new-window -P -F '#{pane_id}' -n "$name" -c "$dir")
+tmux split-window -h -l 40% -t "$claude_pane" -c "$dir"
+tmux send-keys -t "$claude_pane" 'claude' Enter
+tmux select-pane -t "$claude_pane"
