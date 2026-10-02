@@ -23,21 +23,10 @@
     ]
   },
   "model": "opus",
-  "enabledPlugins": {
-    "shortcuts-playground@shortcuts-playground": true
-  },
-  "extraKnownMarketplaces": {
-    "shortcuts-playground": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/viticci/shortcuts-playground-plugin.git"
-      }
-    }
-  },
-  "effortLevel": "medium",
+  "effortLevel": "high",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
     }
   },
   "tui": "fullscreen",
