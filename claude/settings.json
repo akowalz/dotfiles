@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run build)",
+      "Bash(npm test)",
+      "Bash(npx vitest run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(bun test *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(git push *)",
+      "Bash(gh pr create *)"
+    ],
+    "ask": [
+      "Bash(git push *main*)",
+      "Bash(git push *master*)",
+      "Bash(gh pr merge *)"
+    ]
+  },
+  "model": "opus",
+  "enabledPlugins": {
+    "shortcuts-playground@shortcuts-playground": true
+  },
+  "extraKnownMarketplaces": {
+    "shortcuts-playground": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/viticci/shortcuts-playground-plugin.git"
+      }
+    }
+  },
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "tui": "fullscreen",
+  "vimInsertModeRemaps": {
+    "jk": "<Esc>"
+  },
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
+}

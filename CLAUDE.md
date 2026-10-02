@@ -7,6 +7,8 @@ Personal dotfiles for macOS: bash, vim, tmux, git, IdeaVim, plus small scripts i
 `setup.sh` symlinks each of these repo files to `~/.<name>`:
 `bashrc`, `bash_profile`, `gitconfig`, `gitignore`, `git-prompt-colors.sh`,
 `tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links `bin/` to `~/bin`.
+Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
+(just the file, since `~/.claude` itself holds session state).
 
 - It skips any destination that already exists, so it never overwrites anything.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.

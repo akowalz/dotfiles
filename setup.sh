@@ -34,6 +34,10 @@ symlink vim
 symlink vimrc
 symlink ideavimrc
 
+# Claude Code: link the settings file only, since ~/.claude also holds session state
+mkdir -p ~/.claude
+symlink claude/settings.json
+
 if [ -e ~/bin ]
 then
   echo "~/bin already exists, skipping."
