@@ -36,3 +36,4 @@ Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
 - vim: `vim +PlugInstall +qall` after changing plugins, then open vim and check for startup errors.
 - Brewfile: `brew bundle check`.
 - `setup.sh` is safe to re-run because it skips existing links. However, each run still re-runs PlugInstall and the `defaults write` commands.
+- Ask user to individually test changes
