@@ -4,12 +4,7 @@ printf "Installing utilities.\n\n"
 
 if ! type brew &> /dev/null; then
   echo "Installing homebrew."
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
-if ! type mas &> /dev/null; then
-  echo "Installing mas-cli."
-  brew install mas
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 echo "Installing dependencies from Brewfile"
