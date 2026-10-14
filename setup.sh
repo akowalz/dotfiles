@@ -4,8 +4,9 @@ realpath() {
   [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
+# symlink <name> [dest]: link <name> to dest, which defaults to ~/.<name>
 symlink () {
-  dest=~/.$1
+  dest=${2:-~/.$1}
   echo "Setting up $1"
 
   if [ -e $dest ]
@@ -39,6 +40,9 @@ symlink ideavimrc
 # Claude Code: link the settings file only, since ~/.claude also holds session state
 mkdir -p ~/.claude
 symlink claude/settings.json
+
+mkdir -p ~/.config/cmux
+symlink cmux.json ~/.config/cmux/cmux.json
 
 if [ -e ~/bin ]
 then

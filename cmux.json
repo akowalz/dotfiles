@@ -1,0 +1,73 @@
+{
+  "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "schemaVersion": 1,
+
+  // tmux-style navigation behind a ^A prefix, mirroring tmux.conf.
+  // cmux nesting: workspace (sidebar entry, ~ tmux window) > pane (split) > tab.
+  // Reload with ^A r (or Cmd+Shift+,).
+  "shortcuts": {
+    "bindings": {
+      // split windows like vim
+      "splitDown": ["ctrl+a", "s"],
+      "splitRight": ["ctrl+a", "v"],
+
+      // move around panes with hjkl
+      "focusLeft": ["ctrl+a", "h"],
+      "focusDown": ["ctrl+a", "j"],
+      "focusUp": ["ctrl+a", "k"],
+      "focusRight": ["ctrl+a", "l"],
+      "focusNextPane": ["ctrl+a", "o"],
+      "toggleSplitZoom": ["ctrl+a", "z"],
+
+      // workspaces, the closest thing to tmux windows
+      "newTab": ["ctrl+a", "c"],
+      "nextSidebarTab": {
+        "first": {
+          "command": true,
+          "control": false,
+          "key": "]",
+          "keyCode": 30,
+          "option": false,
+          "shift": true
+        }
+      },
+      "prevSidebarTab": {
+        "first": {
+          "command": true,
+          "control": false,
+          "key": "[",
+          "keyCode": 33,
+          "option": false,
+          "shift": true
+        }
+      },
+      "focusHistoryLast": ["ctrl+a", "ctrl+a"],
+      "moveWorkspaceUp": ["ctrl+a", "shift+left"],
+      "moveWorkspaceDown": ["ctrl+a", "shift+right"],
+      "renameWorkspace": ["ctrl+a", ","],
+      "closeWorkspace": ["ctrl+a", "shift+k"],
+      "goToWorkspace": ["ctrl+a", "shift+l"],
+
+      "toggleTerminalCopyMode": ["ctrl+a", "["],
+      "reloadConfiguration": ["ctrl+a", "r"],
+      "nextSurface": {
+        "first": {
+          "command": false,
+          "control": false,
+          "key": "",
+          "option": false,
+          "shift": false
+        }
+      },
+      "prevSurface": {
+        "first": {
+          "command": false,
+          "control": false,
+          "key": "",
+          "option": false,
+          "shift": false
+        }
+      }
+    }
+  }
+}

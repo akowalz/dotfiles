@@ -2,3 +2,6 @@ vim/plugged
 vim/.netrwhist
 Brewfile.lock.json
 .vscode/
+
+# cmux leaves this next to cmux.json while it writes settings
+*.cmux-write.lock

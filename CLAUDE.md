@@ -9,6 +9,7 @@ Personal dotfiles for macOS: zsh (with bash kept as a fallback), vim, tmux, git,
 `tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links `bin/` to `~/bin`.
 Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
 (just the file, since `~/.claude` itself holds session state).
+cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
 
 - It skips any destination that already exists, so it never overwrites anything.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.
