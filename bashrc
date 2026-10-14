@@ -121,13 +121,7 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # Tool configs and path adjustments (some of these may not be very cross-platform)
 export PATH=$HOME/bin:$PATH
 export PATH=/usr/local/bin:$PATH
-
-. "$HOME/.local/bin/env"
-eval "$(uv generate-shell-completion bash)"
+export PATH=$HOME/.local/bin:$PATH # Claude Code's native install
 
 # direnv
-eval "$(direnv hook bash)"
-
-# bun (installed per-user in ~/.bun)
-export BUN_INSTALL="$HOME/.bun"
-[ -d "$BUN_INSTALL/bin" ] && export PATH="$BUN_INSTALL/bin:$PATH"
+type direnv &> /dev/null && eval "$(direnv hook bash)"
