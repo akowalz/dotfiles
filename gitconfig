@@ -4,6 +4,24 @@
   sort = -committerdate
 [core]
   excludesfile = ~/.gitignore
+  pager = delta
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true # n / N jump between files
+  side-by-side = true
+  # Plain headers instead of the default blue boxes
+  file-style = bold orange
+  file-decoration-style = ol
+  hunk-header-style = line-number syntax
+  hunk-header-decoration-style = none
+  line-numbers-left-style = dim
+  line-numbers-right-style = dim
+  # Follow the terminal theme's colors, like the prompt
+  syntax-theme = ansi
+  line-numbers-zero-style = dim
+  line-numbers-minus-style = red
+  line-numbers-plus-style = green
 [pull]
   rebase = true
 [diff]
