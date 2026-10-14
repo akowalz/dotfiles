@@ -119,17 +119,19 @@ compinit
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
 
-# Prompt: (path) [branch|●✚?] ✘(exit code)
-#         $
-# ● staged, ✚ changed, ? untracked
+# Prompt: path on branch ●✚? ✘ exit-code
+#         ❯
+# ● staged, ✚ changed, ? untracked. ❯ turns red when the last command failed.
+# Every color here is one of the 16 the terminal theme defines (named ones, and 8 = bright black),
+# so the prompt follows the theme. Colors 16-255 would be fixed regardless of theme.
 autoload -Uz vcs_info add-zsh-hook
 add-zsh-hook precmd vcs_info
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' check-for-changes true
 zstyle ':vcs_info:git:*' stagedstr '%F{green}●'
 zstyle ':vcs_info:git:*' unstagedstr '%F{red}✚'
-zstyle ':vcs_info:git:*' formats ' [%F{cyan}%b%c%u%m%f]'
-zstyle ':vcs_info:git:*' actionformats ' [%F{cyan}%b%f|%F{yellow}%a%c%u%m%f]'
+zstyle ':vcs_info:git:*' formats ' %F{8}on%f %F{cyan}%b%c%u%m%f'
+zstyle ':vcs_info:git:*' actionformats ' %F{8}on%f %F{cyan}%b%c%u%m %F{yellow}(%a)%f'
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-separator
 
 +vi-git-untracked() {
@@ -138,16 +140,16 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-separator
   fi
 }
 
-# Put a "|" between the branch and the status flags, when there are any
+# Put a space between the branch and the status flags, when there are any
 +vi-git-separator() {
   if [[ -n ${hook_com[staged]}${hook_com[unstaged]}${hook_com[misc]} ]]; then
-    hook_com[branch]+='%f|'
+    hook_com[branch]+=' '
   fi
 }
 
 setopt prompt_subst
-PROMPT='%B%F{35}(%~)%f%b${vcs_info_msg_0_}%(?.. %F{red}✘(%?%)%f)
-$ '
+PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}%(?.. %F{red}✘ %?%f)
+%(?.%F{magenta}.%F{red})❯%f '
 
 export EDITOR=vim
 
