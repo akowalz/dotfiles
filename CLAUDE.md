@@ -1,11 +1,11 @@
 # CLAUDE.md
 
-Personal dotfiles for macOS: bash, vim, tmux, git, IdeaVim, plus small scripts in `bin/`.
+Personal dotfiles for macOS: zsh (with bash kept as a fallback), vim, tmux, git, IdeaVim, plus small scripts in `bin/`.
 
 ## Layout
 
 `setup.sh` symlinks each of these repo files to `~/.<name>`:
-`bashrc`, `bash_profile`, `gitconfig`, `gitignore`, `git-prompt-colors.sh`,
+`bashrc`, `bash_profile`, `zshrc`, `zprofile`, `gitconfig`, `gitignore`, `git-prompt-colors.sh`,
 `tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links `bin/` to `~/bin`.
 Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
 (just the file, since `~/.claude` itself holds session state).
@@ -17,9 +17,10 @@ Claude Code's global settings live in `claude/settings.json`, linked to `~/.clau
 
 ## Bootstrapping a new machine
 
-1. `./install.sh` installs Homebrew and `mas` if they're missing, runs `brew bundle` (Brewfile), clones tpm into `~/.tmux/plugins/tpm`, and downloads `~/.git-completion.bash`.
+1. `./install.sh` installs Homebrew if it's missing, runs `brew bundle` (Brewfile), clones tpm into `~/.tmux/plugins/tpm`, and downloads `~/.git-completion.bash`.
 2. `./setup.sh` creates the symlinks, runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and applies some macOS `defaults write` settings.
 3. tmux plugins are installed by hand (tpm: `prefix + I`).
+4. Create `~/.gitconfig.local` with a `[user]` name and email. `gitconfig` includes it, so the identity stays out of this repo.
 
 Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
 
@@ -31,7 +32,7 @@ Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
 
 ## Testing changes
 
-- Shell files: `bash -n <file>`, then `source ~/.bashrc` (or open a new shell).
+- Shell files: `zsh -n <file>` (or `bash -n` for bash files), then `source ~/.zshrc` (or open a new shell).
 - tmux: `tmux source-file ~/.tmux.conf`.
 - vim: `vim +PlugInstall +qall` after changing plugins, then open vim and check for startup errors.
 - Brewfile: `brew bundle check`.
