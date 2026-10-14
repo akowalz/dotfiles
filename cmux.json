@@ -21,26 +21,9 @@
 
       // workspaces, the closest thing to tmux windows
       "newTab": ["ctrl+a", "c"],
-      "nextSidebarTab": {
-        "first": {
-          "command": true,
-          "control": false,
-          "key": "]",
-          "keyCode": 30,
-          "option": false,
-          "shift": true
-        }
-      },
-      "prevSidebarTab": {
-        "first": {
-          "command": true,
-          "control": false,
-          "key": "[",
-          "keyCode": 33,
-          "option": false,
-          "shift": true
-        }
-      },
+      // next/prev workspace on the browser's tab-switching keys
+      "nextSidebarTab": "cmd+shift+]",
+      "prevSidebarTab": "cmd+shift+[",
       "focusHistoryLast": ["ctrl+a", "ctrl+a"],
       "moveWorkspaceUp": ["ctrl+a", "shift+left"],
       "moveWorkspaceDown": ["ctrl+a", "shift+right"],
@@ -50,24 +33,10 @@
 
       "toggleTerminalCopyMode": ["ctrl+a", "["],
       "reloadConfiguration": ["ctrl+a", "r"],
-      "nextSurface": {
-        "first": {
-          "command": false,
-          "control": false,
-          "key": "",
-          "option": false,
-          "shift": false
-        }
-      },
-      "prevSurface": {
-        "first": {
-          "command": false,
-          "control": false,
-          "key": "",
-          "option": false,
-          "shift": false
-        }
-      }
+
+      // unbind the cmd+shift+]/[ defaults, now used for workspaces
+      "nextSurface": null,
+      "prevSurface": null
     }
   }
 }
