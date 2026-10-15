@@ -21,10 +21,10 @@
 
       // workspaces, the closest thing to tmux windows
       "newTab": ["ctrl+a", "c"],
-      // next/prev workspace on the browser's tab-switching keys
-      "nextSidebarTab": "cmd+shift+]",
-      "prevSidebarTab": "cmd+shift+[",
-      "focusHistoryLast": ["ctrl+a", "ctrl+a"],
+      // up/down the sidebar's workspace list
+      "nextSidebarTab": "cmd+down",
+      "prevSidebarTab": "cmd+up",
+      "focusHistoryLast": ["ctrl+a", "a"],
       "moveWorkspaceUp": ["ctrl+a", "shift+left"],
       "moveWorkspaceDown": ["ctrl+a", "shift+right"],
       "renameWorkspace": ["ctrl+a", ","],
@@ -32,11 +32,11 @@
       "goToWorkspace": ["ctrl+a", "shift+l"],
 
       "toggleTerminalCopyMode": ["ctrl+a", "["],
-      "reloadConfiguration": ["ctrl+a", "r"],
-
-      // unbind the cmd+shift+]/[ defaults, now used for workspaces
-      "nextSurface": null,
-      "prevSurface": null
+      "reloadConfiguration": ["ctrl+a", "r"]
+    },
+    // leave cmd+down to open the selection in the file explorer
+    "when": {
+      "nextSidebarTab": "!sidebarFocus"
     }
   }
 }
