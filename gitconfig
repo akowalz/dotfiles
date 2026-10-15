@@ -9,7 +9,7 @@
   diffFilter = delta --color-only
 [delta]
   navigate = true # n / N jump between files
-  side-by-side = true
+  line-numbers = true
   # Plain headers instead of the default blue boxes
   file-style = bold orange
   file-decoration-style = ol
