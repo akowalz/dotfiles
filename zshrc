@@ -4,10 +4,24 @@ typeset -gU path fpath
 
 # Aliases
 alias g='git'
-alias gd='git diff'
 alias gs='git status'
 alias gl='git log'
 alias gp='git pull --prune'
+
+# git diff, including untracked files as new, so new files get reviewed along with changes.
+# It marks them intent-to-add (git add -N) in a throwaway copy of the index,
+# so the real index is left alone.
+gd() {
+  local idx tmp
+  idx=$(git rev-parse --git-path index) || return
+  tmp=$(mktemp)
+  cp "$idx" "$tmp" 2>/dev/null || rm "$tmp" # no index yet in a brand-new repo
+  GIT_INDEX_FILE=$tmp git add -N :/
+  GIT_INDEX_FILE=$tmp git diff "$@"
+  local ret=$?
+  rm -f "$tmp"
+  return $ret
+}
 
 alias bi='bundle install'
 alias be='bundle exec'
