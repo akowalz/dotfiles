@@ -44,6 +44,9 @@ symlink claude/settings.json
 mkdir -p ~/.config/cmux
 symlink cmux.json ~/.config/cmux/cmux.json
 
+mkdir -p ~/.config/ghostty
+symlink ghostty.conf ~/.config/ghostty/config
+
 if [ -e ~/bin ]
 then
   echo "~/bin already exists, skipping."
