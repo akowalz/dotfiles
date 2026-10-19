@@ -5,7 +5,11 @@
 #   t list the files in this dir by increasing size
 #   t -y fetch the raw html from google.com     # skip confirmation
 #
-# Model can be overridden with T_MODEL (default: haiku).
+# The shell parses the request before t sees it. zshrc aliases t to noglob t, so ? and *
+# are fine, but quote a request containing an apostrophe, $, `backticks` or #:
+#   t "find files that don't end in .txt"
+#
+# Model can be overridden with T_MODEL (default: opus).
 
 set -o pipefail
 
@@ -32,22 +36,51 @@ Reply with ONLY the command, on one line, with no explanation, no markdown and n
 Chain with && or | if several steps are needed. Prefer tools that ship with the OS.
 If the request cannot be done safely as a command, reply with: echo \"<short reason>\""
 
-cmd=$(claude -p --model "${T_MODEL:-haiku}" --tools "" \
-  --system-prompt "$system_prompt" "$*" 2>&1)
-status=$?
-if [ $status -ne 0 ] || [ -z "$cmd" ]; then
-  echo "t: claude failed: $cmd" >&2
-  exit 1
+# The command comes back as a JSON field rather than free text,
+# so markdown (code fences, `backticks`, a "$ " prompt) can't leak into it.
+schema='{"type":"object","properties":{"command":{"type":"string"}},"required":["command"],"additionalProperties":false}'
+
+# Claude Code-style spinner on stderr while claude runs.
+spin() {
+  local frames=(· ✢ ✳ ✶ ✻ ✽ ✻ ✶ ✳ ✢) i=0
+  printf '\033[?25l' >&2 # hide the cursor
+  while :; do
+    printf '\r\033[38;5;208m%s Working…\033[0m' "${frames[i++ % ${#frames[@]}]}" >&2
+    sleep 0.12
+  done
+}
+stop_spin() {
+  [ -n "$spinner" ] || return 0
+  kill "$spinner" 2>/dev/null
+  wait "$spinner" 2>/dev/null
+  spinner=
+  printf '\r\033[K\033[?25h' >&2 # clear the line, show the cursor
+}
+spinner=
+trap stop_spin EXIT
+trap 'stop_spin; exit 130' INT
+if [ -t 2 ]; then
+  spin &
+  spinner=$!
 fi
 
-# Strip any stray code fences / surrounding whitespace.
-cmd=$(printf '%s\n' "$cmd" | sed -e '/^```/d' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+out=$(claude -p --model "${T_MODEL:-opus}" --tools "" --output-format json \
+  --json-schema "$schema" --system-prompt "$system_prompt" "$*" </dev/null)
+status=$?
+stop_spin
+cmd=$(printf '%s' "$out" | jq -r '.structured_output.command // empty' 2>/dev/null)
+if [ $status -ne 0 ] || [ -z "$cmd" ]; then
+  echo "t: claude failed: $(printf '%s' "$out" | jq -r '.result // empty' 2>/dev/null)" >&2
+  exit 1
+fi
 
 printf '\033[1;36m$ %s\033[0m\n' "$cmd" >&2
 
 if [ $confirm -eq 1 ]; then
-  printf 'Run? [Y/n/e(dit)] ' >&2
-  read -r answer </dev/tty
+  # one keypress, no Enter needed after it: Enter (or y) runs, e edits, anything else cancels
+  printf '\033[2m↵ run · e edit · any other key cancels\033[0m' >&2
+  IFS= read -rsn1 answer </dev/tty
+  printf '\r\033[K' >&2
   case "$answer" in
     ""|y|Y) ;;
     e|E)

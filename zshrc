@@ -127,6 +127,13 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
+# t (bin/t) takes plain English. noglob passes ? and * through as-is, so
+#   t which process is using port 3000?
+# works instead of failing with "no matches found". Quote the request when it has
+# an apostrophe, $, `backticks` or #, which zsh still interprets:
+#   t "find files that don't end in .txt"
+alias t='noglob t'
+
 # Completion. git completion comes built in, and covers the g alias.
 autoload -Uz compinit
 compinit
