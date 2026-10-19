@@ -10,13 +10,5 @@ fi
 echo "Installing dependencies from Brewfile"
 brew bundle
 
-echo "Checking for tmux plugin manager"
-if [ -d ~/.tmux/plugins/tpm ]; then
-  echo "Already installed."
-else
-  echo "Installing tmux plugin manager"
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-fi
-
 echo "Done."
 echo "Run the setup script to configure these utilites."
