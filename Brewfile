@@ -10,6 +10,7 @@ brew "watch" # rerun a command every few seconds
 brew "gh"   # used by Claude Code
 brew "fzf"  # git select, zsh key bindings
 brew "git-delta" # git pager (gitconfig)
+brew "diffnav" # diff viewer with a file tree (gv in zshrc)
 
 brew "tmux"
 

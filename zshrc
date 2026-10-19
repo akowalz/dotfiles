@@ -23,6 +23,19 @@ gd() {
   return $ret
 }
 
+# gv: browse the same changes as gd (untracked files included) in diffnav, one file at a time
+# from a file tree. Takes gd's arguments too, e.g. gv --staged or gv main.
+gv() {
+  local diff
+  # standard a/ b/ path prefixes, which diffnav expects, instead of gitconfig's mnemonic i/ w/
+  diff=$(gd --src-prefix=a/ --dst-prefix=b/ "$@") || return
+  if [[ -z $diff ]]; then
+    echo "No changes."
+    return
+  fi
+  print -r -- "$diff" | diffnav
+}
+
 alias bi='bundle install'
 alias be='bundle exec'
 
