@@ -9,7 +9,6 @@ My macOS setup.
 - vim
 - tmux
 - cmux and Ghostty
-- Claude Code
 - `bin/` scripts, including `t` (plain English to shell commands) and `dps` (a tidier `docker ps`)
 
 ## Setup

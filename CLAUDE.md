@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-Personal dotfiles for macOS: zsh, vim, tmux, git, cmux/Ghostty, Claude Code, plus small scripts in `bin/`.
+Personal dotfiles for macOS: zsh, vim, tmux, git, cmux/Ghostty, plus small scripts in `bin/`.
 
 ## Layout
 
 `setup.sh` symlinks each of these repo files to `~/.<name>`:
 `zshrc`, `zprofile`, `gitconfig`, `gitignore`,
 `tmux.conf`, `vim/`, `vimrc`. It also links each script in `bin/` into a real `~/bin` directory, so other tools that install into `~/bin` stay out of this repo.
-Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
-(just the file, since `~/.claude` itself holds session state).
+Claude Code's settings (`~/.claude/settings.json`) are deliberately not tracked: Claude Code saves them by
+replacing the file, which turns a symlink back into a plain file.
 cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
 `ghostty.conf` is linked to `~/.config/ghostty/config`; cmux reads it for terminal behavior.
 

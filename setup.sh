@@ -33,10 +33,6 @@ symlink tmux.conf
 symlink vim
 symlink vimrc
 
-# Claude Code: link the settings file only, since ~/.claude also holds session state
-mkdir -p ~/.claude
-symlink claude/settings.json
-
 mkdir -p ~/.config/cmux
 symlink cmux.json ~/.config/cmux/cmux.json
 
