@@ -76,7 +76,9 @@
   copy-sha = "!sh -c 'git rev-parse HEAD | pbcopy'"
   reset-file= "!sh -c 'git checkout $(git default-branch) $1'"
   branch-name=rev-parse --abbrev-ref HEAD
-  default-branch="!git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
+  # Reads origin/HEAD locally, falling back to asking the remote (slow) when it isn't set.
+  # If the remote's default branch changes, update it with: git remote set-head origin -a
+  default-branch="!b=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null) && echo ${b#origin/} || git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
   reset-to-origin="!git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)"
 # Name, email and anything else machine-specific, kept out of this public repo.
 # Last, so it overrides the settings above.
