@@ -11,6 +11,8 @@ alias gp='git pull --prune'
 # git diff, including untracked files as new, so new files get reviewed along with changes.
 # It marks them intent-to-add (git add -N) in a throwaway copy of the index,
 # so the real index is left alone.
+# Drop the gd alias a shell may still have from before this was a function, or reload fails to parse it.
+unalias gd 2>/dev/null
 gd() {
   local idx tmp
   idx=$(git rev-parse --git-path index) || return
