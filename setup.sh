@@ -47,14 +47,18 @@ symlink cmux.json ~/.config/cmux/cmux.json
 mkdir -p ~/.config/ghostty
 symlink ghostty.conf ~/.config/ghostty/config
 
-if [ -e ~/bin ]
+# Link each script into a real ~/bin, rather than linking ~/bin to bin/,
+# so whatever else installs into ~/bin stays out of this repo.
+if [ -L ~/bin ] && [ "$(readlink ~/bin)" = "$(realpath bin)" ]
 then
-  echo "~/bin already exists, skipping."
-else
-  echo "Linking bin to ~/bin"
-  ln -fs $(realpath bin) ~/bin
+  echo "Replacing the old ~/bin link to this repo with a directory"
+  rm ~/bin
 fi
-printf "\n"
+mkdir -p ~/bin
+for script in bin/*
+do
+  symlink $script ~/$script
+done
 
 echo "Installing vim plugins."
 vim +PlugInstall +qall

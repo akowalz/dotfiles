@@ -6,7 +6,7 @@ Personal dotfiles for macOS: zsh (with bash kept as a fallback), vim, tmux, git,
 
 `setup.sh` symlinks each of these repo files to `~/.<name>`:
 `bashrc`, `bash_profile`, `zshrc`, `zprofile`, `gitconfig`, `gitignore`, `git-prompt-colors.sh`,
-`tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links `bin/` to `~/bin`.
+`tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links each script in `bin/` into a real `~/bin` directory, so other tools that install into `~/bin` stay out of this repo.
 Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
 (just the file, since `~/.claude` itself holds session state).
 cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
@@ -15,7 +15,7 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 - It skips any destination that already exists, so it never overwrites anything.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.
 - `gitignore` is the global git excludes file. `.gitignore` is this repo's own ignore file.
-- Custom scripts go in `bin/` (on PATH as `~/bin`). Make them executable and give them a shebang.
+- Custom scripts go in `bin/` (on PATH via `~/bin`). Make them executable, give them a shebang, and re-run `setup.sh` (or `ln -s`) to link a new one.
 
 ## Bootstrapping a new machine
 
