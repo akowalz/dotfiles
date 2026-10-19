@@ -22,14 +22,11 @@ symlink () {
 
 printf "Setting up config files.\n\n"
 
-symlink bashrc
-symlink bash_profile
 symlink zshrc
 symlink zprofile
 
 symlink gitconfig
 symlink gitignore
-symlink git-prompt-colors.sh
 
 symlink tmux.conf
 

@@ -1,6 +1,6 @@
 # Dotfiles
 
-This repo includes my configuration files for vim, tmux, bash, git, and more.
+This repo includes my configuration files for zsh, vim, tmux, git, cmux, and more.
 
 ## Install and Setup
 

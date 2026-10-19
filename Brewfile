@@ -2,7 +2,6 @@
 
 # Shell
 brew "zsh-autosuggestions"
-brew "bash-git-prompt" # bash fallback prompt
 brew "direnv"
 
 # git
