@@ -138,6 +138,10 @@ alias t='noglob t'
 autoload -Uz compinit
 compinit
 
+# fzf (Brewfile): Ctrl+R fuzzy history, Ctrl+T paste a file path, Option+C cd into a subdirectory.
+# After bindkey -e and compinit, which would otherwise undo its bindings and completion.
+(( $+commands[fzf] )) && source <(fzf --zsh)
+
 # Appearance
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
