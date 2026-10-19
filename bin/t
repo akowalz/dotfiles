@@ -42,13 +42,15 @@ If the request cannot be done safely as a command, make the command: echo \"<sho
 # so markdown (code fences, `backticks`, a "$ " prompt) can't leak into it.
 schema='{"type":"object","properties":{"command":{"type":"string"},"description":{"type":"string"}},"required":["command","description"],"additionalProperties":false}'
 
-# Claude Code-style spinner on stderr while claude runs.
+# Spinner on stderr while claude runs, with a word picked at random each run.
 spin() {
-  local frames=(· ✢ ✳ ✶ ✻ ✽ ✻ ✶ ✳ ✢) i=0
+  local frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏) i=0
+  local words=(Tinkering Wrangling Scheming Grepping Summoning)
+  local word=${words[RANDOM % ${#words[@]}]}
   printf '\033[?25l' >&2 # hide the cursor
   while :; do
-    printf '\r\033[33m%s Working…\033[0m' "${frames[i++ % ${#frames[@]}]}" >&2 # theme yellow
-    sleep 0.12
+    printf '\r\033[33m%s %s…\033[0m' "${frames[i++ % ${#frames[@]}]}" "$word" >&2 # theme yellow
+    sleep 0.08
   done
 }
 stop_spin() {
