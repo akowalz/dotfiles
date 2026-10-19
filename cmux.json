@@ -2,6 +2,34 @@
   "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
   "schemaVersion": 1,
 
+  // new workspaces open as two side-by-side panes (a vim-style vertical split)
+  "actions": {
+    "two-panes": {
+      "type": "workspace",
+      "title": "Two Panes",
+      "workspace": {
+        // blank, so cmux names the workspace as usual instead of "Two Panes"
+        "name": "",
+        "layout": {
+          "direction": "horizontal",
+          "children": [
+            { "pane": { "surfaces": [{ "type": "terminal", "focus": true }] } },
+            { "pane": { "surfaces": [{ "type": "terminal" }] } }
+          ]
+        }
+      }
+    }
+  },
+  "ui": {
+    "newWorkspace": { "action": "two-panes" }
+  },
+
+  // name workspaces and tabs after what their Claude Code conversation is about.
+  // Uses `claude -p` on a fast model; names set by hand are never overwritten.
+  "automation": {
+    "workspaceAutoNaming": true
+  },
+
   // tmux-style navigation behind a ^A prefix, mirroring tmux.conf.
   // cmux nesting: workspace (sidebar entry, ~ tmux window) > pane (split) > tab.
   // Reload with ^A r (or Cmd+Shift+,).
@@ -20,10 +48,15 @@
       "toggleSplitZoom": ["ctrl+a", "z"],
 
       // workspaces, the closest thing to tmux windows
-      "newTab": ["ctrl+a", "c"],
-      // up/down the sidebar's workspace list
-      "nextSidebarTab": "cmd+down",
-      "prevSidebarTab": "cmd+up",
+      // swapped from the defaults: cmd+n opens a window, cmd+shift+n a workspace
+      "newWindow": "cmd+n",
+      "newTab": "cmd+shift+n",
+      // down/up the sidebar's workspace list, like vim's j/k.
+      // Takes cmd+k from Ghostty's clear screen (^L still clears).
+      "nextSidebarTab": "cmd+j",
+      "prevSidebarTab": "cmd+k",
+      // was on cmd+j
+      "showWindowHints": null,
       "focusHistoryLast": ["ctrl+a", "a"],
       "moveWorkspaceUp": ["ctrl+a", "shift+left"],
       "moveWorkspaceDown": ["ctrl+a", "shift+right"],
@@ -33,10 +66,6 @@
 
       "toggleTerminalCopyMode": ["ctrl+a", "["],
       "reloadConfiguration": ["ctrl+a", "r"]
-    },
-    // leave cmd+down to open the selection in the file explorer
-    "when": {
-      "nextSidebarTab": "!sidebarFocus"
     }
   }
 }
