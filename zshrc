@@ -1,5 +1,5 @@
 # Keep PATH entries unique, since nested and login shells re-add them.
-# -g, because reload sources this from inside a function, where typeset would make them local.
+# -g keeps them global if this is ever sourced from inside a function (typeset would make them local).
 typeset -gU path fpath
 
 # Aliases
@@ -11,8 +11,6 @@ alias gp='git pull --prune'
 # git diff, including untracked files as new, so new files get reviewed along with changes.
 # It marks them intent-to-add (git add -N) in a throwaway copy of the index,
 # so the real index is left alone.
-# Drop the gd alias a shell may still have from before this was a function, or reload fails to parse it.
-unalias gd 2>/dev/null
 gd() {
   local idx tmp
   idx=$(git rev-parse --git-path index) || return
@@ -28,8 +26,8 @@ gd() {
 alias bi='bundle install'
 alias be='bundle exec'
 
-alias dc-exec='docker-compose exec'
-alias dc='docker-compose'
+alias dc-exec='docker compose exec'
+alias dc='docker compose'
 
 alias tf='terraform'
 
@@ -38,18 +36,20 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -e -' # run last command
 
-# Default docker ps output is too wide
-alias dps='docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"'
-
 # Pipe into here to format json nicely, e.g:
 # curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
 
 alias weather='curl wttr.in/chicago'
 
+# Replace this shell with a fresh one, so removed aliases and functions go away too
+# (source only adds). Refuses while jobs are running, since exec would kill them.
 reload() {
-  source ~/.zshrc;
-  echo 'Done.';
+  if [[ -n $(jobs) ]]; then
+    echo "reload: background jobs are running; finish or disown them first" >&2
+    return 1
+  fi
+  exec zsh
 }
 
 # History. zsh saves none by default.

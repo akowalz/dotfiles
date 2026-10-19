@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+#
+# dps - docker ps, condensed: one colored line per container, grouped by compose project.
+#
+#   dps        running containers
+#   dps -a     stopped ones too (any docker ps flag works, except --format)
+#
+# Each line: state dot, name (the compose service, if any), uptime, health or exit code,
+# published ports as host→container (exposed-only ports are left out), image.
+# When the terminal is too narrow, the image is dropped first, then ports are cut short.
+
+set -o pipefail
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "dps: docker not found on PATH" >&2
+  exit 1
+fi
+
+fmt='{{.Names}}\t{{.State}}\t{{.Status}}\t{{.Ports}}\t{{.Image}}'
+fmt+='\t{{.Label "com.docker.compose.project"}}\t{{.Label "com.docker.compose.service"}}'
+fmt+='\t{{.Label "com.docker.compose.container-number"}}'
+out=$(docker ps "$@" --format "$fmt") || exit
+
+if [ -z "$out" ]; then
+  case " $* " in
+    *" -a "* | *" --all "*) echo "No containers." ;;
+    *) echo "No running containers." ;;
+  esac
+  exit 0
+fi
+
+# Fit to the terminal and use color only when printing to one.
+cols=0 color=0
+if [ -t 1 ]; then
+  cols=$(tput cols)
+  [ -z "$NO_COLOR" ] && color=1
+fi
+
+# awk here counts bytes, not characters, so widths are worked out with ASCII
+# stand-ins (">" for →, "~" for …) that are swapped in when printing.
+printf '%s\n' "$out" | sort -t $'\t' -k6,6 -k7,7 -k1,1 | awk -F '\t' -v cols="$cols" -v color="$color" '
+function c(code, s) { return (color && code != "" && s != "") ? "\033[" code "m" s "\033[0m" : s }
+function spaces(w,   s) { s = ""; while (w-- > 0) s = s " "; return s }
+# colored text padded to w, with the padding outside the color so trailing spaces can be trimmed
+function col(code, s, w) { return c(code, s) spaces(w - length(s)) }
+function cut(s, w) { return length(s) > w ? substr(s, 1, w - 1) "~" : s }
+# keep whole ports that fit in w, ending with "~" when some are left out
+function cutports(s, w,   a, n, i, out) {
+  if (length(s) <= w) return s
+  n = split(s, a, " "); out = ""
+  for (i = 1; i <= n; i++) {
+    if (length(out) + (out == "" ? 0 : 1) + length(a[i]) + 2 > w) break
+    out = out (out == "" ? "" : " ") a[i]
+  }
+  return out == "" ? cut(s, w) : out " ~"
+}
+
+# "4 days" -> "4d", "About an hour" -> "1h", "3 weeks ago" -> "3w ago"
+function short(t,   ago, n, u) {
+  ago = sub(/ ago$/, "", t) ? " ago" : ""
+  if (t ~ /^Less than a second/) return "<1s" ago
+  if (t ~ /^About a minute/) return "1m" ago
+  if (t ~ /^About an hour/) return "1h" ago
+  n = t; sub(/ .*/, "", n)
+  u = t; sub(/^[0-9]+ /, "", u)
+  if (u ~ /^second/) return n "s" ago
+  if (u ~ /^minute/) return n "m" ago
+  if (u ~ /^hour/) return n "h" ago
+  if (u ~ /^day/) return n "d" ago
+  if (u ~ /^week/) return n "w" ago
+  if (u ~ /^month/) return n "mo" ago
+  if (u ~ /^year/) return n "y" ago
+  return t ago
+}
+
+# "0.0.0.0:8080->80/tcp, [::]:8080->80/tcp, 5432/tcp" -> ":8080>80"
+function ports(p,   a, n, i, e, host, ctr, proto, s, out, seen) {
+  n = split(p, a, ", ")
+  out = ""
+  for (i = 1; i <= n; i++) {
+    e = a[i]
+    if (e !~ /->/) continue
+    host = e; sub(/->.*/, "", host); sub(/.*:/, "", host)
+    ctr = e; sub(/.*->/, "", ctr)
+    proto = ctr; sub(/.*\//, "", proto); sub(/\/.*/, "", ctr)
+    s = ":" host (host == ctr ? "" : ">" ctr) (proto == "tcp" ? "" : "/" proto)
+    if (s in seen) continue # the same port published on IPv4 and IPv6
+    seen[s] = 1
+    out = out (out == "" ? "" : " ") s
+  }
+  return out
+}
+
+{
+  i = ++n
+  proj[i] = $6
+  name[i] = $7 != "" ? $7 ($8 != "" && $8 != 1 ? "-" $8 : "") : $1
+  state[i] = $2
+  image[i] = $5
+  port[i] = ports($4)
+
+  status = $3
+  note[i] = ""; tone[i] = ""
+  if (status ~ /\(healthy\)/) { note[i] = "healthy"; tone[i] = "32" }
+  else if (status ~ /\(unhealthy\)/) { note[i] = "unhealthy"; tone[i] = "31" }
+  else if (status ~ /\(health: starting\)/) { note[i] = "starting"; tone[i] = "33" }
+  else if (status ~ /\(Paused\)/) { note[i] = "paused"; tone[i] = "33" }
+  if (match(status, /^(Exited|Restarting) \([-0-9]+\)/)) {
+    code = substr(status, RSTART, RLENGTH); sub(/.*\(/, "", code); sub(/\)/, "", code)
+    if (status ~ /^Restarting/) { note[i] = "restarting"; tone[i] = "33" }
+    else { note[i] = "exit " code; tone[i] = code == 0 ? "2" : "31" }
+  }
+  sub(/^Up /, "", status)
+  sub(/^(Exited|Restarting) \([-0-9]+\) /, "", status)
+  gsub(/ \([^)]*\)/, "", status)
+  age[i] = state[i] == "created" ? "" : short(status)
+  if (state[i] == "created") { note[i] = "created"; tone[i] = "2" }
+
+  if (length(name[i]) > wn) wn = length(name[i])
+  if (length(age[i]) > wa) wa = length(age[i])
+  if (length(note[i]) > wt) wt = length(note[i])
+  if (length(port[i]) > wp) wp = length(port[i])
+  if (length(image[i]) > wi) wi = length(image[i])
+  if (proj[i] != "") grouped = 1
+}
+
+END {
+  indent = grouped ? "  " : ""
+  fixed = length(indent) + 2 + wn + (wa ? 2 + wa : 0) + (wt ? 2 + wt : 0)
+  if (cols > 0) {
+    if (fixed + (wp ? 2 + wp : 0) + (wi ? 2 + wi : 0) > cols) wi = 0
+    if (wp && fixed + 2 + wp > cols) wp = cols - fixed - 2
+    if (wp && wp < 6) wp = 0
+    if (fixed > cols) wn -= fixed - cols
+    if (wn < 4) wn = 4
+  }
+
+  # compose projects in order, then containers outside any project
+  for (pass = 1; pass <= 2; pass++) {
+    for (i = 1; i <= n; i++) {
+      if ((pass == 1) != (proj[i] != "")) continue
+      if (grouped && proj[i] != last) {
+        if (printed) print ""
+        print c("1;34", proj[i] != "" ? proj[i] : "other")
+        last = proj[i]
+      }
+      dot = state[i] == "running" ? "32" : state[i] ~ /^(paused|restarting)$/ ? "33" : state[i] == "created" ? "2" : "31"
+      line = indent c(dot, "●") " " col("1", cut(name[i], wn), wn)
+      if (wa) line = line "  " col("", age[i], wa)
+      if (wt) line = line "  " col(tone[i], note[i], wt)
+      if (wp) line = line "  " col("36", cutports(port[i], wp), wp)
+      if (wi) line = line "  " c("2", image[i])
+      sub(/ +$/, "", line)
+      gsub(/>/, "→", line)
+      gsub(/~/, "…", line)
+      print line
+      printed = 1
+    }
+    if (pass == 1) last = "\001"
+  }
+}'
