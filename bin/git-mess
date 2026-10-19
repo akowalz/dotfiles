@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+#
+# git-mess - how much uncommitted mess the current repo has, at a glance:
+#
+#   ●2 ✚3 −1 ✖1 ?4 ↑1↓2
+#   staged, changed, deleted, conflicted, untracked, commits ahead/behind upstream
+#
+# Prints nothing when the tree is clean and in sync, or outside a git repo.
+#
+#   git-mess            plain text
+#   git-mess --prompt   with zsh prompt colors (zshrc puts this in the prompt)
+#   git-mess --sidebar  also show it on this workspace in cmux's sidebar, cleared when clean
+#   git-mess --hook     for a Claude Code hook: cd to the session's cwd from the JSON on stdin,
+#                       then --sidebar, so the sidebar keeps up with Claude's edits too
+
+prompt=0 sidebar=0
+for arg in "$@"; do
+  case "$arg" in
+    --prompt) prompt=1 ;;
+    --sidebar) sidebar=1 ;;
+    --hook)
+      sidebar=1
+      cwd=$(jq -r '.cwd // empty' 2>/dev/null)
+      [ -n "$cwd" ] && { cd "$cwd" || exit 0; }
+      ;;
+    *) echo "usage: git-mess [--prompt] [--sidebar] [--hook]" >&2; exit 1 ;;
+  esac
+done
+
+# Each count: porcelain v2 lines start with 1/2 (changed), u (conflict) or ? (untracked);
+# XY is the index and worktree status of a changed file.
+counts=$(git status --porcelain=v2 --branch 2>/dev/null | awk '
+  /^# branch\.ab / { ahead = substr($3, 2); behind = substr($4, 2) }
+  /^[12] / {
+    x = substr($2, 1, 1); y = substr($2, 2, 1)
+    if (x != ".") staged++
+    if (y == "M" || y == "T") changed++
+    if (y == "D") deleted++
+  }
+  /^u / { conflicts++ }
+  /^\? / { untracked++ }
+  END { print staged+0, changed+0, deleted+0, conflicts+0, untracked+0, ahead+0, behind+0 }
+')
+read -r staged changed deleted conflicts untracked ahead behind <<<"${counts:-0 0 0 0 0 0 0}"
+
+plain="" colored=""
+add() { # add <count> <symbol> <zsh color>
+  [ "$1" -gt 0 ] || return
+  plain+="${plain:+ }$2$1"
+  colored+="${colored:+ }%F{$3}$2$1%f"
+}
+add "$staged" ● green
+add "$changed" ✚ red
+add "$deleted" − red
+add "$conflicts" ✖ red
+add "$untracked" '?' cyan
+sync=""
+[ "$ahead" -gt 0 ] && sync+="↑$ahead"
+[ "$behind" -gt 0 ] && sync+="↓$behind"
+if [ -n "$sync" ]; then
+  plain+="${plain:+ }$sync"
+  colored+="${colored:+ }%F{yellow}$sync%f"
+fi
+
+# In the background, so the prompt never waits on cmux.
+if [ $sidebar -eq 1 ] && [ -n "$CMUX_WORKSPACE_ID" ] && command -v cmux >/dev/null 2>&1; then
+  if [ -n "$plain" ]; then
+    cmux set-status git_mess "$plain" --icon pencil --workspace "$CMUX_WORKSPACE_ID" >/dev/null 2>&1 &
+  else
+    cmux clear-status git_mess --workspace "$CMUX_WORKSPACE_ID" >/dev/null 2>&1 &
+  fi
+fi
+
+if [ $prompt -eq 1 ]; then
+  printf '%s' "$colored"
+elif [ $sidebar -eq 0 ]; then
+  [ -n "$plain" ] && printf '%s\n' "$plain"
+fi
+exit 0

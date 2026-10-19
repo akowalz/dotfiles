@@ -98,36 +98,26 @@ fi
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
 
-# Prompt: path on branch ●✚? ✘ exit-code
+# Prompt: path on branch ●2 ✚3 −1 ?4 ↑1 ✘ exit-code
 #         ❯
-# ● staged, ✚ changed, ? untracked. ❯ turns red when the last command failed.
+# Counts of staged, changed, deleted, (✖ conflicted,) untracked files and commits ahead/behind,
+# from bin/git-mess. Inside cmux it also puts them on the workspace's sidebar entry.
+# ❯ turns red when the last command failed.
 # Every color here is one of the 16 the terminal theme defines (named ones, and 8 = bright black),
 # so the prompt follows the theme. Colors 16-255 would be fixed regardless of theme.
 autoload -Uz vcs_info add-zsh-hook
 add-zsh-hook precmd vcs_info
 zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' stagedstr '%F{green}●'
-zstyle ':vcs_info:git:*' unstagedstr '%F{red}✚'
-zstyle ':vcs_info:git:*' formats ' %F{8}on%f %F{cyan}%b%c%u%m%f'
-zstyle ':vcs_info:git:*' actionformats ' %F{8}on%f %F{cyan}%b%c%u%m %F{yellow}(%a)%f'
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-separator
+zstyle ':vcs_info:git:*' formats ' %F{8}on%f %F{cyan}%b%f'
+zstyle ':vcs_info:git:*' actionformats ' %F{8}on%f %F{cyan}%b %F{yellow}(%a)%f'
 
-+vi-git-untracked() {
-  if [[ -n $(git ls-files --others --exclude-standard --directory --no-empty-directory -- ':/' 2>/dev/null | head -1) ]]; then
-    hook_com[misc]+='%F{cyan}?'
-  fi
+_git_mess_precmd() {
+  _git_mess=$(git-mess --prompt ${CMUX_WORKSPACE_ID:+--sidebar})
 }
-
-# Put a space between the branch and the status flags, when there are any
-+vi-git-separator() {
-  if [[ -n ${hook_com[staged]}${hook_com[unstaged]}${hook_com[misc]} ]]; then
-    hook_com[branch]+=' '
-  fi
-}
+add-zsh-hook precmd _git_mess_precmd
 
 setopt prompt_subst
-PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}%(?.. %F{red}✘ %?%f)
+PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?%f)
 %(?.%F{magenta}.%F{red})❯%f '
 
 export EDITOR=vim
