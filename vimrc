@@ -4,7 +4,6 @@ call plug#begin('~/.vim/plugged')
 " Navigation
 Plug 'scrooloose/nerdtree'
 " Tools
-Plug 'benmills/vimux'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
@@ -228,7 +227,3 @@ nnoremap <Leader>ns o<CR>---<CR><CR><ESC>
 
 " New code fence
 nnoremap <Leader>cf o<CR>```<CR>```<ESC>O
-
-" Vimux --------------------- {{{
-source ~/.vim/vimux_settings.vim
-"}}}
