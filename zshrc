@@ -88,6 +88,11 @@ compinit
 # fzf (Brewfile): Ctrl+R fuzzy history, Ctrl+T paste a file path, Option+C cd into a subdirectory.
 # After bindkey -e and compinit, which would otherwise undo its bindings and completion.
 (( $+commands[fzf] )) && source <(fzf --zsh)
+# List with fd, so pickers skip whatever .gitignore ignores (build output, vendor, ...).
+if (( $+commands[fd] )); then
+  export FZF_CTRL_T_COMMAND='fd --hidden --exclude .git'
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+fi
 
 # Appearance
 export CLICOLOR=1
