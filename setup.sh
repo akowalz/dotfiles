@@ -32,7 +32,6 @@ symlink tmux.conf
 
 symlink vim
 symlink vimrc
-symlink ideavimrc
 
 # Claude Code: link the settings file only, since ~/.claude also holds session state
 mkdir -p ~/.claude
@@ -59,8 +58,6 @@ done
 
 echo "Installing vim plugins."
 vim +PlugInstall +qall
-
-echo "tmux plugins must be installed manually!"
 
 echo "Done."
 

@@ -1,27 +1,27 @@
 # Dotfiles
 
-This repo includes my configuration files for zsh, vim, tmux, git, cmux, and more.
+My macOS setup.
 
-## Install and Setup
+## What's here
 
-The install script (intended for macOS) will install homebrew, tmux, and a few other things needed by the setup script.
+- zsh
+- git
+- vim
+- tmux
+- cmux and Ghostty
+- Claude Code
+- `bin/` scripts, including `t` (plain English to shell commands) and `dps` (a tidier `docker ps`)
 
-```sh
-./install.sh
-```
-
-The setup script will create symlinks from this repo to your home directory, skipping anything that already exists, and install vim plugins.
-
-```sh
-./setup.sh
-```
-
-## Other notes
-
-Some Vim settings and plugins require Vim 8+, which can be install via homebrew.
-
-To automatically attach to a tmux session every time a new terminal window is opened, configure Terminal to run the following on startup (Terminal > Preferences > Shell > Startup > Run Command):
+## Setup
 
 ```sh
-tmux new-session -A -s main
+./install.sh   # installs Homebrew if needed, then the Brewfile
+./setup.sh     # symlinks everything into ~, installs vim plugins, sets some macOS defaults
 ```
+
+`setup.sh` never overwrites anything; it skips links that already exist, so it's safe to re-run.
+
+Machine-specific settings stay out of this public repo, in untracked files:
+
+- `~/.gitconfig.local`: your git `[user]` name and email (required).
+- `~/.zshrc.local`: anything else, such as language runtimes and version managers.

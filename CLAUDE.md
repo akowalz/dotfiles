@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-Personal dotfiles for macOS: zsh, vim, tmux, git, IdeaVim, cmux/Ghostty, plus small scripts in `bin/`.
+Personal dotfiles for macOS: zsh, vim, tmux, git, cmux/Ghostty, Claude Code, plus small scripts in `bin/`.
 
 ## Layout
 
 `setup.sh` symlinks each of these repo files to `~/.<name>`:
 `zshrc`, `zprofile`, `gitconfig`, `gitignore`,
-`tmux.conf`, `vim/`, `vimrc`, `ideavimrc`. It also links each script in `bin/` into a real `~/bin` directory, so other tools that install into `~/bin` stay out of this repo.
+`tmux.conf`, `vim/`, `vimrc`. It also links each script in `bin/` into a real `~/bin` directory, so other tools that install into `~/bin` stay out of this repo.
 Claude Code's global settings live in `claude/settings.json`, linked to `~/.claude/settings.json`
 (just the file, since `~/.claude` itself holds session state).
 cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
@@ -19,10 +19,9 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 
 ## Bootstrapping a new machine
 
-1. `./install.sh` installs Homebrew if it's missing, runs `brew bundle` (Brewfile), and clones tpm into `~/.tmux/plugins/tpm`.
+1. `./install.sh` installs Homebrew if it's missing and runs `brew bundle` (Brewfile).
 2. `./setup.sh` creates the symlinks, runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and applies some macOS `defaults write` settings.
-3. tmux plugins are installed by hand (tpm: `prefix + I`).
-4. Create `~/.gitconfig.local` with a `[user]` name and email. `gitconfig` includes it, so the identity stays out of this repo.
+3. Create `~/.gitconfig.local` with a `[user]` name and email. `gitconfig` includes it, so the identity stays out of this repo.
 
 Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
 
