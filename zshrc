@@ -8,32 +8,25 @@ alias gs='git status'
 alias gl='git log'
 alias gp='git pull --prune'
 
-# git diff, including untracked files as new, so new files get reviewed along with changes.
-# It marks them intent-to-add (git add -N) in a throwaway copy of the index,
-# so the real index is left alone.
-gd() {
-  local idx tmp
-  idx=$(git rev-parse --git-path index) || return
-  tmp=$(mktemp)
-  cp "$idx" "$tmp" 2>/dev/null || rm "$tmp" # no index yet in a brand-new repo
-  GIT_INDEX_FILE=$tmp git add -N :/
-  GIT_INDEX_FILE=$tmp git diff "$@"
-  local ret=$?
-  rm -f "$tmp"
-  return $ret
-}
+# git diff, including untracked files as new (bin/git-diff-all). Takes git diff's arguments.
+alias gd='git diff-all'
 
-# gv: browse the same changes as gd (untracked files included) in diffnav, one file at a time
-# from a file tree. Takes gd's arguments too, e.g. gv --staged or gv main.
+# gv: browse everything changed since the last commit (staged, unstaged and new files) in diffnav,
+# one file at a time from a file tree. Arguments replace HEAD, e.g. gv --staged or gv main.
 gv() {
-  local diff
-  diff=$(gd "$@") || return
+  local diff args=("$@")
+  # no HEAD yet in a brand-new repo
+  (( $# )) || ! git rev-parse -q --verify HEAD >/dev/null || args=(HEAD)
+  diff=$(git diff-all "${args[@]}") || return
   if [[ -z $diff ]]; then
     echo "No changes."
     return
   fi
   print -r -- "$diff" | diffnav
 }
+
+# gvw: gv that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
+alias gvw='diffnav --watch --watch-cmd "git diff-all HEAD"'
 
 alias bi='bundle install'
 alias be='bundle exec'

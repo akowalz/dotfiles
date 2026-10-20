@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# git diff-all - git diff, including untracked files as new, so new files get reviewed along with
+# changes. It marks them intent-to-add (git add -N) in a throwaway copy of the index, so the real
+# index is left alone. Takes git diff's arguments.
+#
+# Git runs any git-<name> on PATH as `git <name>`, so this works from any shell, including the
+# watch command of diffnav (gvw in zshrc). gd in zshrc is short for it.
+
+idx=$(git rev-parse --git-path index) || exit
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+cp "$idx" "$tmp" 2>/dev/null || rm "$tmp" # no index yet in a brand-new repo
+GIT_INDEX_FILE=$tmp git add -N :/
+GIT_INDEX_FILE=$tmp git diff "$@"
