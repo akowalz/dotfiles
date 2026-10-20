@@ -11,6 +11,7 @@ Claude Code's settings (`~/.claude/settings.json`) are deliberately not tracked:
 replacing the file, which turns a symlink back into a plain file.
 cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
 `ghostty.conf` is linked to `~/.config/ghostty/config`; cmux reads it for terminal behavior.
+`diffnav.yml` is linked to `~/.config/diffnav/config.yml`.
 
 - It skips any destination that already exists, so it never overwrites anything.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.

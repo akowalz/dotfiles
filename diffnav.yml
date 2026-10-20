@@ -1,0 +1,5 @@
+# diffnav config (gv and gvw in zshrc), linked to ~/.config/diffnav/config.yml.
+ui:
+  # Unified diffs by default, like delta in gitconfig. s toggles side-by-side while browsing.
+  sideBySide: false
+  theme: catppuccin_macchiato

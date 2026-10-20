@@ -39,6 +39,9 @@ symlink cmux.json ~/.config/cmux/cmux.json
 mkdir -p ~/.config/ghostty
 symlink ghostty.conf ~/.config/ghostty/config
 
+mkdir -p ~/.config/diffnav
+symlink diffnav.yml ~/.config/diffnav/config.yml
+
 # Link each script into a real ~/bin, rather than linking ~/bin to bin/,
 # so whatever else installs into ~/bin stays out of this repo.
 if [ -L ~/bin ] && [ "$(readlink ~/bin)" = "$(realpath bin)" ]
