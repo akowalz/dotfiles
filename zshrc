@@ -27,8 +27,7 @@ gd() {
 # from a file tree. Takes gd's arguments too, e.g. gv --staged or gv main.
 gv() {
   local diff
-  # standard a/ b/ path prefixes, which diffnav expects, instead of gitconfig's mnemonic i/ w/
-  diff=$(gd --src-prefix=a/ --dst-prefix=b/ "$@") || return
+  diff=$(gd "$@") || return
   if [[ -z $diff ]]; then
     echo "No changes."
     return
