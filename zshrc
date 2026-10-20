@@ -125,6 +125,36 @@ setopt prompt_subst
 PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?%f)
 %(?.%F{magenta}.%F{red})❯%f '
 
+# boop: append to a long command to hear and see when it's done, e.g. make build ; boop
+# Glass on success, Basso on failure, plus a notification (inside cmux, on this pane).
+# Keeps the command's exit status, so make build ; boop && deploy still works.
+_boop_preexec() {
+  _boop_cmd=$1
+  _boop_start=$SECONDS
+}
+add-zsh-hook preexec _boop_preexec
+
+boop() {
+  local code=$? title sound cmd elapsed
+  setopt local_options extended_glob
+  cmd=${${_boop_cmd%;*}%%[[:space:]]#} # drop the "; boop"
+  elapsed=$(( SECONDS - _boop_start ))
+  (( elapsed >= 60 )) && elapsed="$(( elapsed / 60 ))m $(( elapsed % 60 ))s" || elapsed+=s
+  if (( code == 0 )); then
+    title='✓ Done' sound=Glass
+  else
+    title="✘ Failed (exit $code)" sound=Basso
+  fi
+  afplay /System/Library/Sounds/$sound.aiff &!
+  if [[ -n $CMUX_WORKSPACE_ID ]] && (( $+commands[cmux] )); then
+    cmux notify --title $title --body "$cmd · $elapsed" >/dev/null
+  else
+    osascript -e 'on run argv' -e 'display notification (item 2 of argv) with title (item 1 of argv)' \
+      -e 'end run' $title "$cmd · $elapsed"
+  fi
+  return code
+}
+
 export EDITOR=vim
 
 # Tool configs and path adjustments (some of these may not be very cross-platform)
