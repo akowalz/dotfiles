@@ -41,6 +41,9 @@ alias vi='vim'
 alias ll='ls -al'
 alias l='fc -e -' # run last command
 
+mkcd() { mkdir -p -- "$1" && cd -- "$1"; } # make a directory and cd into it
+alias cpwd='print -rn -- $PWD | pbcopy'    # copy the current directory's path
+
 # Pipe into here to format json nicely, e.g:
 # curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
