@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+#
+# murder <pid> - stop a process, politely first: TERM, then INT, HUP and finally KILL,
+# waiting a couple of seconds after each for it to exit.
+
+pid=$1
+if [ $# -ne 1 ] || [[ -z $pid || $pid == *[!0-9]* ]]; then
+  echo "usage: murder <pid>" >&2
+  exit 1
+fi
+
+alive() { ps -p "$pid" >/dev/null 2>&1; } # unlike kill -0, also true for processes we may not signal
+
+if ! alive; then
+  echo "murder: no process $pid" >&2
+  exit 1
+fi
+
+for sig in TERM INT HUP KILL; do
+  if ! kill -s $sig "$pid" 2>/dev/null; then
+    alive || break # it exited on its own just now
+    echo "murder: can't signal $pid (another user's process? try sudo)" >&2
+    exit 1
+  fi
+  for _ in {1..20}; do # up to 2s
+    alive || break
+    sleep 0.1
+  done
+  if ! alive; then
+    echo "$pid: stopped ($sig)"
+    exit 0
+  fi
+done
+
+if alive; then
+  echo "murder: $pid still running after KILL" >&2
+  exit 1
+fi
