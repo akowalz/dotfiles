@@ -4,4 +4,4 @@ ui:
   sideBySide: false
   hideHeader: true
   # diffnav only has fixed-color themes, so it can't follow the terminal's colors like delta does
-  theme: catppuccin_macchiato
+  theme: one_half_dark
