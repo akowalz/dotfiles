@@ -68,7 +68,9 @@ if [ -t 2 ]; then
   spinner=$!
 fi
 
-out=$(claude -p --model "${T_MODEL:-opus}" --tools "" --output-format json \
+# Without NODE_OPTIONS: projects may set it for their own node (e.g. --use-system-ca via mise),
+# and claude reads it too, which can break its connection to the API.
+out=$(env -u NODE_OPTIONS claude -p --model "${T_MODEL:-opus}" --tools "" --output-format json \
   --json-schema "$schema" --system-prompt "$system_prompt" "$*" </dev/null)
 status=$?
 stop_spin
