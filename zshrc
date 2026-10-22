@@ -87,6 +87,16 @@ bindkey '^X^E' edit-command-line
 # works instead of failing with "no matches found". Quote the request when it has
 # an apostrophe, $, `backticks` or #, which zsh still interprets:
 #   t "find files that don't end in .txt"
+# The function adds the command t ran to history, so up-arrow brings it back.
+# (Defined before the alias, which would otherwise expand in "t() {".)
+t() {
+  local cmd_file=$(mktemp) ret
+  T_HISTORY_FILE=$cmd_file command t "$@"
+  ret=$?
+  [[ -s $cmd_file ]] && print -rs -- "$(<$cmd_file)"
+  rm -f $cmd_file
+  return ret
+}
 alias t='noglob t'
 
 # Completion. git completion comes built in, and covers the g alias.

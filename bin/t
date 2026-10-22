@@ -9,6 +9,8 @@
 # are fine, but quote a request containing an apostrophe, $, `backticks` or #:
 #   t "find files that don't end in .txt"
 #
+# In zsh, the command it runs is added to your history, so up-arrow brings it back.
+#
 # Model can be overridden with T_MODEL (default: opus).
 
 set -o pipefail
@@ -103,5 +105,8 @@ if [ $confirm -eq 1 ]; then
     *) exit 1 ;;
   esac
 fi
+
+# The zsh function t (zshrc) passes a file here, and adds the command to the shell's history.
+[ -n "$T_HISTORY_FILE" ] && printf '%s\n' "$cmd" >"$T_HISTORY_FILE"
 
 eval "$cmd"
