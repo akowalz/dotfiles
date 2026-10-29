@@ -119,7 +119,7 @@ export LSCOLORS="GxFxCxDxBxegedabagaced"
 # Prompt: path on branch ●2 ✚3 −1 ?4 ↑1 ✘ exit-code
 #         ❯
 # Counts of staged, changed, deleted, (✖ conflicted,) untracked files and commits ahead/behind,
-# from bin/git-mess. Inside cmux it also puts them on the workspace's sidebar entry.
+# from bin/git-mess.
 # ❯ turns red when the last command failed.
 # Every color here is one of the 16 the terminal theme defines (named ones, and 8 = bright black),
 # so the prompt follows the theme. Colors 16-255 would be fixed regardless of theme.
@@ -130,7 +130,7 @@ zstyle ':vcs_info:git:*' formats ' %F{8}on%f %F{cyan}%b%f'
 zstyle ':vcs_info:git:*' actionformats ' %F{8}on%f %F{cyan}%b %F{yellow}(%a)%f'
 
 _git_mess_precmd() {
-  _git_mess=$(git-mess --prompt ${CMUX_WORKSPACE_ID:+--sidebar})
+  _git_mess=$(git-mess --prompt)
 }
 add-zsh-hook precmd _git_mess_precmd
 

@@ -9,21 +9,12 @@
 #
 #   git-mess            plain text
 #   git-mess --prompt   with zsh prompt colors (zshrc puts this in the prompt)
-#   git-mess --sidebar  also show it on this workspace in cmux's sidebar, cleared when clean
-#   git-mess --hook     for a Claude Code hook: cd to the session's cwd from the JSON on stdin,
-#                       then --sidebar, so the sidebar keeps up with Claude's edits too
 
-prompt=0 sidebar=0
+prompt=0
 for arg in "$@"; do
   case "$arg" in
     --prompt) prompt=1 ;;
-    --sidebar) sidebar=1 ;;
-    --hook)
-      sidebar=1
-      cwd=$(jq -r '.cwd // empty' 2>/dev/null)
-      [ -n "$cwd" ] && { cd "$cwd" || exit 0; }
-      ;;
-    *) echo "usage: git-mess [--prompt] [--sidebar] [--hook]" >&2; exit 1 ;;
+    *) echo "usage: git-mess [--prompt]" >&2; exit 1 ;;
   esac
 done
 
@@ -62,18 +53,9 @@ if [ -n "$sync" ]; then
   colored+="${colored:+ }%F{yellow}$sync%f"
 fi
 
-# In the background, so the prompt never waits on cmux.
-if [ $sidebar -eq 1 ] && [ -n "$CMUX_WORKSPACE_ID" ] && command -v cmux >/dev/null 2>&1; then
-  if [ -n "$plain" ]; then
-    cmux set-status git_mess "$plain" --icon pencil --workspace "$CMUX_WORKSPACE_ID" >/dev/null 2>&1 &
-  else
-    cmux clear-status git_mess --workspace "$CMUX_WORKSPACE_ID" >/dev/null 2>&1 &
-  fi
-fi
-
 if [ $prompt -eq 1 ]; then
   printf '%s' "$colored"
-elif [ $sidebar -eq 0 ]; then
-  [ -n "$plain" ] && printf '%s\n' "$plain"
+elif [ -n "$plain" ]; then
+  printf '%s\n' "$plain"
 fi
 exit 0
