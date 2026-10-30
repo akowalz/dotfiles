@@ -19,7 +19,7 @@ My macOS setup.
 ./macos.sh     # macOS settings on their own (safe to re-run)
 ```
 
-`setup.sh` never overwrites anything; it skips links that already exist, so it's safe to re-run.
+`setup.sh` never overwrites anything: a file already where a link goes moves aside to `<name>.pre-dotfiles`, and links already in place are skipped, so it's safe to re-run.
 
 Machine-specific settings stay out of this public repo, in untracked files:
 

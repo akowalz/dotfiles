@@ -1,20 +1,41 @@
 #!/bin/bash
 
+# Run from the repo, since the links point at its files
+cd "$(dirname "$0")"
+
 realpath() {
   [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
 }
 
-# symlink <name> [dest]: link <name> to dest, which defaults to ~/.<name>
+# Files that were where a link goes, moved aside to <file>.pre-dotfiles,
+# and links not made because an earlier .pre-dotfiles copy was in the way
+moved=()
+skipped=()
+
+# symlink <name> [dest]: link <name> to dest, which defaults to ~/.<name>.
+# A file already at dest, such as a ~/.zshrc an installer wrote or a config an app
+# created on first launch, moves aside to dest.pre-dotfiles, so nothing is overwritten.
 symlink () {
+  src=$(realpath $1)
   dest=${2:-~/.$1}
   echo "Setting up $1"
 
-  if [ -e $dest ]
+  if [ "$(readlink "$dest")" = "$src" ]
   then
-    echo "$dest already exists, skipping."
+    echo "$dest is already linked."
+  elif [ -e "$dest" ] && [ -e "$dest.pre-dotfiles" ]
+  then
+    echo "$dest is in the way, and so is $dest.pre-dotfiles. Move one of them and re-run. Skipping."
+    skipped+=("$dest")
   else
+    if [ -e "$dest" ]
+    then
+      echo "Moving the existing $dest to $dest.pre-dotfiles"
+      mv "$dest" "$dest.pre-dotfiles"
+      moved+=("$dest.pre-dotfiles")
+    fi
     echo "Linking $1 to $dest"
-    ln -fs $(realpath $1) $dest
+    ln -sfn "$src" "$dest"
   fi
 
   printf "\n"
@@ -61,3 +82,15 @@ vim +PlugInstall +qall
 echo "Done."
 
 ./macos.sh
+
+if [ ${#moved[@]} -gt 0 ]
+then
+  printf "\nThese were in the way of a link and moved aside. Keep anything you still want\n"
+  printf "(machine-specific shell setup goes in ~/.zshrc.local), then delete them:\n"
+  printf "  %s\n" "${moved[@]}"
+fi
+if [ ${#skipped[@]} -gt 0 ]
+then
+  printf "\nNot linked, because both the file and its .pre-dotfiles copy exist. Move one and re-run:\n"
+  printf "  %s\n" "${skipped[@]}"
+fi

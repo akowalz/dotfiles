@@ -13,7 +13,7 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 `ghostty.conf` is linked to `~/.config/ghostty/config`; cmux reads it for terminal behavior.
 `diffnav.yml` is linked to `~/.config/diffnav/config.yml`.
 
-- It skips any destination that already exists, so it never overwrites anything.
+- It never overwrites anything. A file already at a destination (say, a `~/.zshrc` an installer wrote) moves aside to `<dest>.pre-dotfiles`, and the run ends by listing them.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.
 - `gitignore` is the global git excludes file. `.gitignore` is this repo's own ignore file.
 - Custom scripts go in `bin/` (on PATH via `~/bin`). Make them executable, give them a shebang, and re-run `setup.sh` (or `ln -s`) to link a new one.
@@ -39,6 +39,6 @@ Add macOS settings (`defaults write` and the like) to `macos.sh`, grouped under 
 - tmux: `tmux source-file ~/.tmux.conf`.
 - vim: `vim +PlugInstall +qall` after changing plugins, then open vim and check for startup errors.
 - Brewfile: `brew bundle check`.
-- `setup.sh` is safe to re-run because it skips existing links. However, each run still re-runs PlugInstall and `macos.sh`.
+- `setup.sh` is safe to re-run because it skips links that are already in place. However, each run still re-runs PlugInstall and `macos.sh`.
 - macOS settings: `bash -n macos.sh`, then `./macos.sh` on its own. Check a value with `defaults read <domain> <key>`.
 - Ask user to individually test changes
