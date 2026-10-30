@@ -48,7 +48,7 @@ alias cpwd='print -rn -- $PWD | pbcopy'    # copy the current directory's path
 # curl http://api.com/endpoint.json | j
 alias j='python -m json.tool'
 
-alias md='glow -p -w 100' # read a markdown file rendered, in a pager
+alias md='glow -p -w 85' # read a markdown file rendered, in a pager
 
 alias weather='curl wttr.in/chicago'
 
