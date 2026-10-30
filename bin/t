@@ -9,7 +9,9 @@
 # are fine, but quote a request containing an apostrophe, $, `backticks` or #:
 #   t "find files that don't end in .txt"
 #
-# In zsh, the command it runs is added to your history, so up-arrow brings it back.
+# In zsh, the t function (zshrc) runs the command in your shell, so aliases, functions, cd and
+# export work, and adds it to your history, so up-arrow brings it back. Claude is told which
+# aliases, functions and tools you have, plus a little about the current directory.
 #
 # Model can be overridden with T_MODEL (default: opus).
 
@@ -32,11 +34,38 @@ if ! command -v claude >/dev/null 2>&1; then
   exit 1
 fi
 
+# Context for Claude. T_ALIASES and T_FUNCTIONS come from the zsh function t (zshrc),
+# which also runs the command, so without them it runs here in bash.
+shell=bash
+[ -n "$T_CMD_FILE" ] && shell=zsh
+
+context=
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  branch=$(git branch --show-current)
+  context+="It's a git repository, on branch ${branch:-(detached HEAD)}."$'\n'
+fi
+entries=$(ls -Ap | wc -l | tr -d ' ')
+if [ "$entries" -gt 0 ]; then
+  context+="Files here ($entries entries, directories end in /): $(ls -Ap | head -n 30 | paste -sd ' ' -)"
+  [ "$entries" -gt 30 ] && context+=" …"
+  context+=$'\n'
+fi
+tools=
+for tool in rg fd fzf jq yq gh delta bat eza tree watch tmux direnv docker kubectl terraform \
+  python3 node ruby go cargo wget ffmpeg magick; do
+  command -v "$tool" >/dev/null && tools+=" $tool"
+done
+context+="Installed tools beyond the OS:$tools."$'\n'
+[ -n "$T_FUNCTIONS" ] && context+="Shell functions: $T_FUNCTIONS."$'\n'
+[ -n "$T_ALIASES" ] && context+="Aliases:"$'\n'"$T_ALIASES"$'\n'
+
 system_prompt="You translate a plain-English request into a single shell command.
-Environment: $(uname -sm), shell: bash, working directory: $PWD.
+Environment: $(uname -sm), shell: $shell, working directory: $PWD.
+$context
 Put the command, on one line with no markdown or code fences, in \"command\".
 Put one short plain-English sentence (under 15 words) saying what it does in \"description\".
-Chain with && or | if several steps are needed. Prefer tools that ship with the OS.
+Chain with && or | if several steps are needed.
+Prefer tools that ship with the OS or are listed above. Use an alias or function when it does what was asked.
 Don't hide errors (no 2>/dev/null) unless asked to, so a failure shows why it failed.
 If the request cannot be done safely as a command, make the command: echo \"<short reason>\""
 
@@ -106,7 +135,10 @@ if [ $confirm -eq 1 ]; then
   esac
 fi
 
-# The zsh function t (zshrc) passes a file here, and adds the command to the shell's history.
-[ -n "$T_HISTORY_FILE" ] && printf '%s\n' "$cmd" >"$T_HISTORY_FILE"
+# The zsh function t (zshrc) passes a file here, then runs the command and adds it to history.
+if [ -n "$T_CMD_FILE" ]; then
+  printf '%s\n' "$cmd" >"$T_CMD_FILE"
+  exit 0
+fi
 
 eval "$cmd"

@@ -89,15 +89,20 @@ bindkey '^X^E' edit-command-line
 # works instead of failing with "no matches found". Quote the request when it has
 # an apostrophe, $, `backticks` or #, which zsh still interprets:
 #   t "find files that don't end in .txt"
-# The function adds the command t ran to history, so up-arrow brings it back.
+# The function tells t about your aliases and functions, then runs the command it gets
+# back here, so they work (and so do cd and export). It also adds the command to history,
+# so up-arrow brings it back.
 # (Defined before the alias, which would otherwise expand in "t() {".)
 t() {
-  local cmd_file=$(mktemp) ret
-  T_HISTORY_FILE=$cmd_file command t "$@"
+  local cmd_file=$(mktemp) cmd ret
+  T_CMD_FILE=$cmd_file T_ALIASES=$(alias) T_FUNCTIONS=${(kj: :)functions:#[_.+-]*} \
+    command t "$@"
   ret=$?
-  [[ -s $cmd_file ]] && print -rs -- "$(<$cmd_file)"
+  cmd=$(<$cmd_file)
   rm -f $cmd_file
-  return ret
+  (( ret )) && return ret
+  print -rs -- "$cmd"
+  eval "$cmd"
 }
 alias t='noglob t'
 
