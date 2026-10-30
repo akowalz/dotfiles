@@ -21,10 +21,11 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 ## Bootstrapping a new machine
 
 1. `./install.sh` installs Homebrew if it's missing and runs `brew bundle` (Brewfile).
-2. `./setup.sh` creates the symlinks, runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and applies some macOS `defaults write` settings.
+2. `./setup.sh` creates the symlinks, runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and runs `macos.sh`.
 3. Create `~/.gitconfig.local` with a `[user]` name and email. `gitconfig` includes it, so the identity stays out of this repo.
 
 Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
+Add macOS settings (`defaults write` and the like) to `macos.sh`, grouped under a comment for their area, with a comment saying what each one does.
 
 ## Working in this repo
 
@@ -38,5 +39,6 @@ Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
 - tmux: `tmux source-file ~/.tmux.conf`.
 - vim: `vim +PlugInstall +qall` after changing plugins, then open vim and check for startup errors.
 - Brewfile: `brew bundle check`.
-- `setup.sh` is safe to re-run because it skips existing links. However, each run still re-runs PlugInstall and the `defaults write` commands.
+- `setup.sh` is safe to re-run because it skips existing links. However, each run still re-runs PlugInstall and `macos.sh`.
+- macOS settings: `bash -n macos.sh`, then `./macos.sh` on its own. Check a value with `defaults read <domain> <key>`.
 - Ask user to individually test changes

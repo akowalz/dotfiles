@@ -15,7 +15,8 @@ My macOS setup.
 
 ```sh
 ./install.sh   # installs Homebrew if needed, then the Brewfile
-./setup.sh     # symlinks everything into ~, installs vim plugins, sets some macOS defaults
+./setup.sh     # symlinks everything into ~, installs vim plugins, runs macos.sh
+./macos.sh     # macOS settings on their own (safe to re-run)
 ```
 
 `setup.sh` never overwrites anything; it skips links that already exist, so it's safe to re-run.
