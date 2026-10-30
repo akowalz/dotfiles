@@ -19,6 +19,8 @@ My macOS setup.
 ./macos.sh     # macOS settings on their own (safe to re-run)
 ```
 
+If an app in the Brewfile was installed by hand, `brew bundle` fails to install it, since the app is already there. Hand it to Homebrew with `brew install --cask --adopt <name>`, then run `./install.sh` again.
+
 `setup.sh` never overwrites anything: a file already where a link goes moves aside to `<name>.pre-dotfiles`, and links already in place are skipped, so it's safe to re-run.
 
 Machine-specific settings stay out of this public repo, in untracked files:
