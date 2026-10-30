@@ -88,6 +88,15 @@ do
   symlink $script ~/$script
 done
 
+# zsh is the login shell, since zshrc and zprofile are written for it.
+# chsh asks for your password.
+if [ "$(dscl . -read /Users/$USER UserShell | awk '{print $2}')" != /bin/zsh ]
+then
+  echo "Changing your login shell to zsh."
+  chsh -s /bin/zsh && echo "Open a new terminal (quit and reopen cmux) to start using it."
+  printf "\n"
+fi
+
 echo "Installing vim plugins."
 vim +PlugInstall +qall
 

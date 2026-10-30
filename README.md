@@ -15,7 +15,7 @@ My macOS setup.
 
 ```sh
 ./install.sh   # installs Homebrew if needed, then the Brewfile
-./setup.sh     # symlinks everything into ~, installs vim plugins, runs macos.sh
+./setup.sh     # symlinks everything into ~, makes zsh your shell, installs vim plugins, runs macos.sh
 ./macos.sh     # macOS settings on their own (safe to re-run)
 ```
 

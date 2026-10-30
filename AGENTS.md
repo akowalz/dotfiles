@@ -22,7 +22,7 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 ## Bootstrapping a new machine
 
 1. `./install.sh` installs Homebrew if it's missing and runs `brew bundle` (Brewfile).
-2. `./setup.sh` creates the symlinks, runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and runs `macos.sh`.
+2. `./setup.sh` creates the symlinks, makes zsh your login shell (`chsh` asks for your password), runs `vim +PlugInstall +qall` (vim-plug, installing into `vim/plugged/`, which is gitignored), and runs `macos.sh`.
 3. Create `~/.gitconfig.local` with a `[user]` name and email. `gitconfig` includes it, so the identity stays out of this repo.
 
 Add Homebrew packages to `Brewfile`, not to ad-hoc install steps.
