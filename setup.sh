@@ -43,6 +43,18 @@ symlink () {
 
 printf "Setting up config files.\n\n"
 
+# Remove links into this repo whose file it no longer has, such as ~/.bashrc
+# from before the switch to zsh. Broken links pointing anywhere else stay.
+for link in ~/.[!.]* ~/.[!.]*/* ~/.config/*/* ~/bin/*
+do
+  if [ -L "$link" ] && [ ! -e "$link" ] && [[ $(readlink "$link") = "$PWD"/* ]]
+  then
+    echo "Removing $link, a link to $(readlink "$link"), which is no longer in this repo"
+    rm "$link"
+  fi
+done
+printf "\n"
+
 symlink zshrc
 symlink zprofile
 

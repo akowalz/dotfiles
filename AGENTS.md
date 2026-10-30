@@ -14,6 +14,7 @@ cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`syml
 `diffnav.yml` is linked to `~/.config/diffnav/config.yml`.
 
 - It never overwrites anything. A file already at a destination (say, a `~/.zshrc` an installer wrote) moves aside to `<dest>.pre-dotfiles`, and the run ends by listing them.
+- It removes links into this repo whose file is gone (say, `~/.bashrc` from before the switch to zsh), and leaves other broken links alone.
 - A new top-level config file needs its own `symlink <name>` line in `setup.sh`.
 - `gitignore` is the global git excludes file. `.gitignore` is this repo's own ignore file.
 - Custom scripts go in `bin/` (on PATH via `~/bin`). Make them executable, give them a shebang, and re-run `setup.sh` (or `ln -s`) to link a new one.
