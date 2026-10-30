@@ -5,6 +5,7 @@ brew "zsh-autosuggestions"
 brew "direnv"
 brew "fd"    # file finder for fzf (zshrc)
 brew "watch" # rerun a command every few seconds
+brew "glow"  # render markdown notes in the terminal
 
 # git
 brew "gh"   # used by Claude Code

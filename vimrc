@@ -13,6 +13,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'tpope/vim-projectionist'
+Plug 'dkarter/bullets.vim'
 
 " Syntax highlighers
 Plug 'pangloss/vim-javascript'
@@ -132,6 +133,24 @@ let g:lightline = {
 
 function! LightlineFullPath()
   return expand('%')
+endfunction
+
+" Bullets: <Leader>x toggles a checkbox, or adds one to a line without it
+let g:bullets_custom_mappings = [
+      \ ['nmap', '<Leader>x', '<Plug>(todo-toggle)'],
+      \ ]
+nnoremap <silent> <Plug>(todo-toggle) :call TodoToggle()<CR>
+
+function! TodoToggle()
+  let l:bullet = '^\s*\%([-*+]\|\d\+[.)]\)'
+  let l:line = getline('.')
+  if l:line =~# l:bullet . '\s\+\[.\]'
+    ToggleCheckbox
+  elseif l:line =~# l:bullet . '\s'
+    call setline('.', substitute(l:line, l:bullet . '\zs\s\+', ' [ ] ', ''))
+  else
+    call setline('.', substitute(l:line, '^\s*\zs', '- [ ] ', ''))
+  endif
 endfunction
 " }}}
 
