@@ -24,6 +24,15 @@
     "newWorkspace": { "action": "two-panes" }
   },
 
+  // a tighter sidebar: one line of the latest message, and the branch and
+  // directory on one line, with only the end of the path, and no listening ports
+  "sidebar": {
+    "notificationMessageLineLimit": 1,
+    "branchVerticalLayout": false,
+    "pathLastSegmentOnly": true,
+    "showPorts": false
+  },
+
   // name workspaces and tabs after what their Claude Code conversation is about.
   // Uses `claude -p` on a fast model; names set by hand are never overwritten.
   "automation": {
