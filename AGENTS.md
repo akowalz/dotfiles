@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Personal dotfiles for macOS: zsh, vim, tmux, git, cmux/Ghostty, plus small scripts in `bin/`.
 
