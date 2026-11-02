@@ -71,6 +71,8 @@ set smoothscroll
 set wildoptions=pum,fuzzy
 set completeopt=menuone,popup,fuzzy
 set pumheight=12
+" diffs line up the most similar lines in a change, and highlight the changed words
+set diffopt-=inline:simple diffopt+=linematch:60,inline:word
 set shortmess+=c
 " persistent undo, kept out of ~/.vim since that's this repo
 set undofile undodir=~/.local/state/vim/undo//
@@ -95,10 +97,12 @@ let &t_EI = "\<Esc>[2 q"
 
 set background=dark
 
-" One Dark, on a near-black background
+" One Dark, on a near-black background, with its text a little brighter than #abb2bf
 let g:onedark_color_overrides = {
       \ 'background': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': 'NONE' },
       \ 'black': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': '0' },
+      \ 'foreground': { 'gui': '#c5cad3', 'cterm': '251', 'cterm16': 'NONE' },
+      \ 'white': { 'gui': '#c5cad3', 'cterm': '251', 'cterm16': '15' },
       \ }
 let g:onedark_terminal_italics = 1
 
@@ -114,9 +118,12 @@ function! s:OnedarkExtras()
   call onedark#set_highlight('LspDiagInlineWarning', { 'sp': l:colors.yellow, 'gui': 'undercurl', 'cterm': 'undercurl' })
   call onedark#set_highlight('LspDiagVirtualTextError', { 'fg': l:colors.red })
   call onedark#set_highlight('LspDiagVirtualTextWarning', { 'fg': l:colors.yellow })
+  " lines the branch changed (vim/plugin/branchsigns.vim)
+  call onedark#set_highlight('BranchSign', { 'fg': l:colors.blue })
 endfunction
 
-colorscheme onedark
+" silent!: on a fresh install, onedark isn't there until PlugInstall runs
+silent! colorscheme onedark
 
 set laststatus=2
 set noshowmode " don't show -- INSERT -- because lightline does it for you
@@ -232,6 +239,8 @@ let g:gitgutter_sign_removed = '▁'
 let g:gitgutter_sign_removed_first_line = '▔'
 let g:gitgutter_sign_modified_removed = '▎'
 let g:gitgutter_preview_win_floating = 1
+" Its bars are uncommitted edits; thinner blue bars mark the rest of what the branch
+" changed since it left master (vim/plugin/branchsigns.vim)
 
 " LSP: diagnostics show as a curly underline plus the message after the line,
 " leaving the sign column to git. Completion stays manual (<C-x><C-o>).
@@ -374,6 +383,23 @@ nnoremap <C-p> :Files<CR>
 "Fugitive
 " <Leader>gg to search for the word under the cursor with Ggrep
 nnoremap <Leader>gg :Ggrep <cword><CR>
+" "the branch" means everything since it left master (BranchBase), uncommitted edits included
+" <Leader>gs status, <Leader>gb blame, <Leader>gl this file's history in quickfix
+nnoremap <Leader>gs <Cmd>Git<CR>
+nnoremap <Leader>gb <Cmd>Git blame<CR>
+nnoremap <Leader>gl <Cmd>0Gclog<CR>
+" <Leader>gd this file's uncommitted changes, <Leader>gD this file's changes on the branch
+nnoremap <Leader>gd <Cmd>Gvdiffsplit<CR>
+nnoremap <Leader>gD <Cmd>execute 'Gvdiffsplit' BranchBase()<CR>
+" <Leader>gr review the branch: a tab per changed file, each a side-by-side diff
+" <Leader>gq the branch's changed files in quickfix (]q and [q to step through)
+nnoremap <Leader>gr <Cmd>execute 'Git difftool -y' BranchBase()<CR>
+nnoremap <Leader>gq <Cmd>execute 'Git difftool --name-only' BranchBase()<CR>
+" ]q and [q next/previous entry in quickfix (changed files, history, grep results)
+nnoremap ]q <Cmd>cnext<CR>
+nnoremap [q <Cmd>cprevious<CR>
+" <Leader>gm turn the branch's signs in the gutter off and on
+nnoremap <Leader>gm <Cmd>call BranchSignsToggle()<CR>
 
 " LSP, in buffers a language server is attached to:
 " gd definition, gr references, K docs, [d and ]d previous/next problem,
