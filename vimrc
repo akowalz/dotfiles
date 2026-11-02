@@ -97,9 +97,10 @@ let &t_EI = "\<Esc>[2 q"
 
 set background=dark
 
-" One Dark, on a near-black background, with its text a little brighter than #abb2bf
+" One Dark on the terminal's own background, so it matches cmux's theme,
+" with its text a little brighter than #abb2bf
 let g:onedark_color_overrides = {
-      \ 'background': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': 'NONE' },
+      \ 'background': { 'gui': 'NONE', 'cterm': 'NONE', 'cterm16': 'NONE' },
       \ 'black': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': '0' },
       \ 'foreground': { 'gui': '#c5cad3', 'cterm': '251', 'cterm16': 'NONE' },
       \ 'white': { 'gui': '#c5cad3', 'cterm': '251', 'cterm16': '15' },
