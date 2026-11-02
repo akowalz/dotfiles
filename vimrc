@@ -9,25 +9,32 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
 Plug 'alvan/vim-closetag'
 Plug 'tomtom/tcomment_vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+" fzf's own vim plugin comes with Homebrew's fzf (Brewfile)
+if isdirectory($HOMEBREW_PREFIX . '/opt/fzf')
+  Plug $HOMEBREW_PREFIX . '/opt/fzf'
+endif
 Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'tpope/vim-projectionist'
 Plug 'dkarter/bullets.vim'
+Plug 'yegappan/lsp'
+Plug 'airblade/vim-gitgutter'
 
-" Syntax highlighers
+" Syntax highlighers (Vim's own TypeScript and Python syntax beat the old plugins)
 Plug 'pangloss/vim-javascript'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'mustache/vim-mustache-handlebars'
-Plug 'hdima/python-syntax'
 Plug 'posva/vim-vue'
-Plug 'leafgarland/typescript-vim'
 
 " Colors and appearance
-Plug 'NLKNguyen/papercolor-theme'
+Plug 'joshdick/onedark.vim'
 Plug 'itchyny/lightline.vim'
 call plug#end()
+
+" Packages that come with Vim: flash yanked text, follow a project's .editorconfig
+packadd! hlyank
+packadd! editorconfig
 " }}}
 
 " General settings ---------- {{{
@@ -49,32 +56,76 @@ set ttymouse=
 set tags=./tags,tags,ctags
 set foldlevelstart=99
 set splitright
-set listchars=trail:_
+let &listchars = 'tab:» ,trail:·,nbsp:␣'
 set list
+" solid lines between splits, and no ~ on the lines past the end of the buffer
+let &fillchars = 'vert:│,fold: ,eob: '
+" don't wait a second after <Esc> to see if it starts a key code
+set ttimeout ttimeoutlen=10
+" refresh git signs soon after typing stops
+set updatetime=100
+" wrapped lines keep their indent and break between words
+set breakindent linebreak
+set smoothscroll
+" command-line and insert completion in a popup menu, matched fuzzily
+set wildoptions=pum,fuzzy
+set completeopt=menuone,popup,fuzzy
+set pumheight=12
+set shortmess+=c
+" persistent undo, kept out of ~/.vim since that's this repo
+set undofile undodir=~/.local/state/vim/undo//
+call mkdir(expand('~/.local/state/vim/undo'), 'p', 0700)
 " }}}
 
 " Appearance ---------------- {{{
+set termguicolors
+" tmux's $TERM (screen-256color) doesn't tell vim how to send true color
+if &term =~# '^\%(screen\|tmux\)'
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
+" curly, colored underlines (for LSP errors)
+let &t_Cs = "\<Esc>[4:3m"
+let &t_Ce = "\<Esc>[4:0m"
+let &t_8u = "\<Esc>[58;2;%lu;%lu;%lum"
+" bar cursor in insert mode, underline in replace mode, block otherwise
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
+
 set background=dark
 
-let g:PaperColor_Theme_Options = {
-      \   'theme': {
-      \     'default.dark': {
-      \       'transparent_background': 1
-      \     }
-      \   }
+" One Dark, on a near-black background
+let g:onedark_color_overrides = {
+      \ 'background': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': 'NONE' },
+      \ 'black': { 'gui': '#0a0a0a', 'cterm': '232', 'cterm16': '0' },
       \ }
+let g:onedark_terminal_italics = 1
 
-colorscheme PaperColor
+augroup onedark_extras
+  autocmd!
+  autocmd ColorScheme onedark call s:OnedarkExtras()
+augroup END
+
+" LSP errors and warnings get a curly underline, and their message the same color
+function! s:OnedarkExtras()
+  let l:colors = onedark#GetColors()
+  call onedark#set_highlight('LspDiagInlineError', { 'sp': l:colors.red, 'gui': 'undercurl', 'cterm': 'undercurl' })
+  call onedark#set_highlight('LspDiagInlineWarning', { 'sp': l:colors.yellow, 'gui': 'undercurl', 'cterm': 'undercurl' })
+  call onedark#set_highlight('LspDiagVirtualTextError', { 'fg': l:colors.red })
+  call onedark#set_highlight('LspDiagVirtualTextWarning', { 'fg': l:colors.yellow })
+endfunction
+
+colorscheme onedark
 
 set laststatus=2
 set noshowmode " don't show -- INSERT -- because lightline does it for you
 
+" brighten the current line's number
+set cursorline cursorlineopt=number
+
 " always show the sign column so the buffer doesn't shift around
 set signcolumn=yes
-
-" sign column (left bar) should display in same color as rest of vim
-highlight SignColumn ctermbg=NONE
-highlight Folded ctermbg=Black
 " }}}
 
 " Autocommands -------------- {{{
@@ -92,7 +143,7 @@ augroup filetype_for_js_snap_file
 augroup END
 
 " Set filetype to dosini for gitconfig file
-augroup filetype_for_js_snap_file
+augroup filetype_for_gitconfig
   autocmd!
   autocmd BufNewFile,BufRead *gitconfig set filetype=dosini
 augroup END
@@ -113,21 +164,42 @@ augroup END
 
 " Plugin Settings ----------- {{{
 "
-" FZF
-let g:fzf_layout = { 'down': '~25%' }
-let $FZF_DEFAULT_COMMAND = 'find * -type f 2>/dev/null | grep -v -E "deps/|_build/|node_modules/|vendor/"'
+" FZF: a floating window, in the colorscheme's colors
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.7 } }
+let g:fzf_colors = {
+      \ 'fg':      ['fg', 'Normal'],
+      \ 'bg':      ['bg', 'Normal'],
+      \ 'hl':      ['fg', 'Statement'],
+      \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+      \ 'hl+':     ['fg', 'Statement'],
+      \ 'info':    ['fg', 'PreProc'],
+      \ 'border':  ['fg', 'VertSplit'],
+      \ 'prompt':  ['fg', 'Conditional'],
+      \ 'pointer': ['fg', 'Exception'],
+      \ 'marker':  ['fg', 'Keyword'],
+      \ 'spinner': ['fg', 'Label'],
+      \ 'header':  ['fg', 'Comment'],
+      \ }
+" fd (Brewfile) skips whatever .gitignore lists
+let $FZF_DEFAULT_COMMAND = executable('fd')
+      \ ? 'fd --type f --hidden --exclude .git'
+      \ : 'find * -type f 2>/dev/null | grep -v -E "deps/|_build/|node_modules/|vendor/"'
 
 " NERDTree
 let g:NERDCreateDefaultMappings = 0
+let g:NERDTreeMinimalUI = 1
 
 " Lightline
 let g:lightline = {
+      \ 'colorscheme': 'onedark',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename', 'modified' ] ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
       \ },
       \ 'component_function': {
       \   'filename': 'LightlineFullPath',
+      \   'gitbranch': 'FugitiveHead',
       \ },
       \ }
 
@@ -152,6 +224,72 @@ function! TodoToggle()
     call setline('.', substitute(l:line, '^\s*\zs', '- [ ] ', ''))
   endif
 endfunction
+
+" Gitgutter: thin bars in the sign column, and hunk previews in a popup
+let g:gitgutter_sign_added = '▎'
+let g:gitgutter_sign_modified = '▎'
+let g:gitgutter_sign_removed = '▁'
+let g:gitgutter_sign_removed_first_line = '▔'
+let g:gitgutter_sign_modified_removed = '▎'
+let g:gitgutter_preview_win_floating = 1
+
+" LSP: diagnostics show as a curly underline plus the message after the line,
+" leaving the sign column to git. Completion stays manual (<C-x><C-o>).
+let s:lsp_options = {
+      \ 'autoComplete': v:false,
+      \ 'omniComplete': v:true,
+      \ 'showDiagWithSign': v:false,
+      \ 'showDiagWithVirtualText': v:true,
+      \ 'diagVirtualTextAlign': 'after',
+      \ 'diagVirtualTextWrap': 'truncate',
+      \ 'echoSignature': v:true,
+      \ 'popupBorder': v:true,
+      \ 'ignoreMissingServer': v:true,
+      \ }
+
+" The servers come from the Brewfile (sourcekit-lsp comes with Xcode); a
+" missing one is skipped.
+"
+" JavaScript and TypeScript: in a project whose own TypeScript has tsserver
+" (TypeScript 6 and older), typescript-language-server runs it, and Vue's
+" <script> blocks go through it too, using the TypeScript plugin that comes
+" with vue-language-server. Anywhere else, Homebrew's TypeScript 7 runs its
+" own language server.
+let s:tsserver = 'node_modules/typescript/lib/tsserver.js'
+let s:vue_language_server = $HOMEBREW_PREFIX . '/opt/vue-language-server/libexec/lib/node_modules/@vue/language-server'
+let s:lsp_servers = [
+      \ { 'name': 'typescript-language-server',
+      \   'path': 'typescript-language-server', 'args': ['--stdio'],
+      \   'filetype': ['javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue'],
+      \   'runIfSearch': [s:tsserver],
+      \   'rootSearch': ['tsconfig.json', 'jsconfig.json', 'package.json', '.git/'],
+      \   'initializationOptions': { 'plugins': isdirectory(s:vue_language_server)
+      \     ? [{ 'name': '@vue/typescript-plugin', 'location': s:vue_language_server, 'languages': ['vue'] }]
+      \     : [] } },
+      \ { 'name': 'tsc',
+      \   'path': $HOMEBREW_PREFIX . '/opt/typescript/bin/tsc', 'args': ['--lsp', '--stdio'],
+      \   'filetype': ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'],
+      \   'runUnlessSearch': [s:tsserver],
+      \   'rootSearch': ['tsconfig.json', 'jsconfig.json', 'package.json', '.git/'] },
+      \ { 'name': 'ruby-lsp',
+      \   'path': 'ruby-lsp',
+      \   'filetype': ['ruby'],
+      \   'rootSearch': ['Gemfile', '.git/'] },
+      \ { 'name': 'pyright',
+      \   'path': 'pyright-langserver', 'args': ['--stdio'],
+      \   'filetype': ['python'],
+      \   'rootSearch': ['pyproject.toml', 'setup.py', 'requirements.txt', '.git/'] },
+      \ { 'name': 'sourcekit',
+      \   'path': 'sourcekit-lsp',
+      \   'filetype': ['swift'],
+      \   'rootSearch': ['Package.swift', '.git/'] },
+      \ ]
+
+augroup lsp_setup
+  autocmd!
+  autocmd User LspSetup call LspOptionsSet(s:lsp_options)
+  autocmd User LspSetup call LspAddServer(s:lsp_servers)
+augroup END
 " }}}
 
 " Mappings ------------------ {{{
@@ -236,9 +374,26 @@ nnoremap <C-p> :Files<CR>
 "Fugitive
 " <Leader>gg to search for the word under the cursor with Ggrep
 nnoremap <Leader>gg :Ggrep <cword><CR>
-" }}}
 
-nnoremap <Leader>ft :call FindCorrespondingTestFile()<CR>
+" LSP, in buffers a language server is attached to:
+" gd definition, gr references, K docs, [d and ]d previous/next problem,
+" <Leader>d the problem on this line, <Leader>rn rename, <Leader>ca code action
+augroup lsp_mappings
+  autocmd!
+  autocmd User LspAttached call s:LspMappings()
+augroup END
+
+function! s:LspMappings()
+  nnoremap <buffer> gd <Cmd>LspGotoDefinition<CR>
+  nnoremap <buffer> gr <Cmd>LspShowReferences<CR>
+  nnoremap <buffer> K <Cmd>LspHover<CR>
+  nnoremap <buffer> [d <Cmd>LspDiag prev<CR>
+  nnoremap <buffer> ]d <Cmd>LspDiag next<CR>
+  nnoremap <buffer> <Leader>d <Cmd>LspDiag current<CR>
+  nnoremap <buffer> <Leader>rn <Cmd>LspRename<CR>
+  nnoremap <buffer> <Leader>ca <Cmd>LspCodeAction<CR>
+endfunction
+" }}}
 
 " Markdown and deskset mappings
 " New slide
