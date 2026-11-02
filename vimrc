@@ -2,7 +2,10 @@
 call plug#begin('~/.vim/plugged')
 
 " Navigation
-Plug 'scrooloose/nerdtree'
+" file tree: fern, with git status marks, and opening a directory (vim .) shows it
+Plug 'lambdalisue/fern.vim', { 'branch': 'main' }
+Plug 'lambdalisue/fern-git-status.vim'
+Plug 'lambdalisue/fern-hijack.vim'
 " Tools
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
@@ -198,9 +201,17 @@ let $FZF_DEFAULT_COMMAND = executable('fd')
       \ ? 'fd --type f --hidden --exclude .git'
       \ : 'find * -type f 2>/dev/null | grep -v -E "deps/|_build/|node_modules/|vendor/"'
 
-" NERDTree
-let g:NERDCreateDefaultMappings = 0
-let g:NERDTreeMinimalUI = 1
+" Fern: the tree opens as a sidebar on the left
+let g:fern#drawer_width = 35
+let g:fern#default_hidden = 1 " show dotfiles
+let g:fern#default_exclude = '^\%(\.git\|\.DS_Store\)$' " but never these
+
+" in the tree, → and ← work like l and h: open or expand, collapse
+augroup fern_arrows
+  autocmd!
+  autocmd FileType fern nmap <buffer><nowait> <Right> <Plug>(fern-action-open-or-expand)
+  autocmd FileType fern nmap <buffer><nowait> <Left> <Plug>(fern-action-collapse)
+augroup END
 
 " Lightline
 let g:lightline = {
@@ -374,10 +385,10 @@ nnoremap <C-CR> <C-]>
 
 " Plugin Command Mappings
 
-" Nerdtree mappings
-nnoremap <Leader>nt :NERDTreeToggle<CR>
-nnoremap <Leader>nr :NERDTree<CR>
-nnoremap <Leader>nf :NERDTreeFind<CR>
+" File tree (fern): <Leader>nt toggle, <Leader>nr open fresh, <Leader>nf open on this file
+nnoremap <Leader>nt <Cmd>Fern . -drawer -toggle<CR>
+nnoremap <Leader>nr <Cmd>Fern . -drawer<CR>
+nnoremap <Leader>nf <Cmd>Fern . -drawer -reveal=%<CR>
 
 " Toggle commenting with Ctrl-\
 map <C-\> :TComment<CR>
