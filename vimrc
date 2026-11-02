@@ -72,7 +72,11 @@ set wildoptions=pum,fuzzy
 set completeopt=menuone,popup,fuzzy
 set pumheight=12
 " diffs line up the most similar lines in a change, and highlight the changed words
-set diffopt-=inline:simple diffopt+=linematch:60,inline:word
+set diffopt-=inline:simple diffopt-=inline:char diffopt+=linematch:60,inline:word
+" histogram diffs need vim's internal diff, which macOS's /usr/bin/vim lacks (Brewfile has vim)
+if &diffopt =~# 'internal'
+  set diffopt+=algorithm:histogram,indent-heuristic
+endif
 set shortmess+=c
 " persistent undo, kept out of ~/.vim since that's this repo
 set undofile undodir=~/.local/state/vim/undo//
