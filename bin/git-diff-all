@@ -5,7 +5,7 @@
 # index is left alone. Takes git diff's arguments.
 #
 # Git runs any git-<name> on PATH as `git <name>`, so this works from any shell, including the
-# watch command of diffnav (gvw in zshrc). gd in zshrc is short for it.
+# watch command of diffnav (gdw in zshrc). gd in zshrc is short for it.
 
 idx=$(git rev-parse --git-path index) || exit
 tmp=$(mktemp)

@@ -25,8 +25,8 @@ gv() {
   print -r -- "$diff" | diffnav
 }
 
-# gvw: gv that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
-alias gvw='diffnav --watch --watch-cmd "git diff-all HEAD"'
+# gdw: gv that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
+alias gdw='diffnav --watch --watch-cmd "git diff-all HEAD"'
 
 alias bi='bundle install'
 alias be='bundle exec'
