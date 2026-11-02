@@ -123,7 +123,7 @@ fi
 export CLICOLOR=1
 export LSCOLORS="GxFxCxDxBxegedabagaced"
 
-# Prompt: path on branch ●2 ✚3 −1 ?4 ↑1 ✘ exit-code
+# Prompt: path on branch ●2 ✚3 −1 ?4 ↑1 ✘ exit-code meaning
 #         ❯
 # Counts of staged, changed, deleted, (✖ conflicted,) untracked files and commits ahead/behind,
 # from bin/git-mess.
@@ -141,8 +141,32 @@ _git_mess_precmd() {
 }
 add-zsh-hook precmd _git_mess_precmd
 
+# What a failed command's exit code means, when it means the same for every command: 126
+# and 127 come from the shell, and 128+n is a command stopped by signal n. Other codes
+# (1, 2, 5...) are each program's own, so they get no label.
+_exit_meaning_precmd() {
+  local code=$?
+  case $code in
+    126) _exit_meaning='not executable' ;;
+    127) _exit_meaning='not found' ;;
+    130) _exit_meaning='interrupted' ;; # Ctrl-C
+    137) _exit_meaning='killed' ;;
+    141) _exit_meaning='broken pipe' ;;
+    143) _exit_meaning='terminated' ;;
+    148) _exit_meaning='suspended' ;; # Ctrl-Z
+    *) # any other signal by name, e.g. SIGSEGV; $signals[1] is EXIT, so signal n is n+1
+      if (( code > 128 && code - 127 <= ${#signals} )); then
+        _exit_meaning="SIG${signals[code - 127]}"
+      else
+        _exit_meaning=
+      fi ;;
+  esac
+}
+# first, so $? is still the command's and not another hook's
+precmd_functions=(_exit_meaning_precmd $precmd_functions)
+
 setopt prompt_subst
-PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?%f)
+PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?${_exit_meaning:+ $_exit_meaning}%f)
 %(?.%F{magenta}.%F{red})❯%f '
 
 # boop: append to a long command to hear and see when it's done, e.g. make build ; boop
