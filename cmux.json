@@ -57,9 +57,6 @@
       "toggleSplitZoom": ["ctrl+a", "z"],
 
       // workspaces, the closest thing to tmux windows
-      // swapped from the defaults: cmd+n opens a window, cmd+shift+n a workspace
-      "newWindow": "cmd+n",
-      "newTab": "cmd+shift+n",
       // down/up the sidebar's workspace list, like vim's j/k.
       // Takes cmd+k from Ghostty's clear screen (^L still clears).
       "nextSidebarTab": "cmd+j",
