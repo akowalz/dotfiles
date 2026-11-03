@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Claude Code status line, set in ~/.claude/settings.json (which isn't tracked) as
+#   "statusLine": { "type": "command", "command": "~/bin/claude-statusline" }
+#   left:  directory, branch, git-mess counts
+#   right: model and effort, context meter, right-aligned to the COLUMNS Claude Code passes in
+# ANSI 16 colors only, so it follows the terminal theme.
+
+export LC_ALL=en_US.UTF-8 # count characters, not bytes, when measuring for right-alignment
+export GIT_OPTIONAL_LOCKS=0
+
+input=$(cat)
+field() { jq -r "$1 // empty" <<<"$input"; }
+cwd=$(field '.workspace.current_dir // .cwd')
+model=$(field '.model.display_name')
+effort=$(field '.effort.level')
+used=$(field '.context_window.used_percentage')
+[ -n "$cwd" ] || cwd=$PWD
+
+e=$'\033'
+reset="${e}[0m"
+# a segment: colored text, no background
+block() { printf '%s' "${e}[${1}m${2}${reset}"; }
+
+# Left -------------------------------------------------------------------------
+left=$(block 34 "${cwd/#$HOME/\~}")
+
+if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
+  branch=$(git -C "$cwd" symbolic-ref --short -q HEAD || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
+  gitdir=$(git -C "$cwd" rev-parse --absolute-git-dir 2>/dev/null)
+  if [ -d "$gitdir/rebase-merge" ] || [ -d "$gitdir/rebase-apply" ]; then branch+=" (rebase)"
+  elif [ -f "$gitdir/MERGE_HEAD" ]; then branch+=" (merge)"
+  elif [ -f "$gitdir/CHERRY_PICK_HEAD" ]; then branch+=" (cherry-pick)"
+  elif [ -f "$gitdir/REVERT_HEAD" ]; then branch+=" (revert)"
+  elif [ -f "$gitdir/BISECT_LOG" ]; then branch+=" (bisect)"
+  fi
+  #  is the Powerline branch symbol, which Ghostty has built in
+  left+=" $(block 36 $''" $branch")"
+
+  # git-mess prints tokens such as "●2 ✚3 −1 ✖1 ?4 ↑1↓2"; color each by its symbol
+  for tok in $(cd "$cwd" && git-mess 2>/dev/null); do
+    case "$tok" in
+      ●*) c=32 ;;          # staged: green
+      ✚*|−*|✖*) c=31 ;;    # changed, deleted, conflicted: red
+      \?*) c=36 ;;         # untracked: cyan
+      *) c=33 ;;           # ahead/behind: yellow
+    esac
+    left+=" ${e}[${c}m${tok}${reset}"
+  done
+fi
+
+# Right ------------------------------------------------------------------------
+right=""
+if [ -n "$model" ]; then
+  right=$(block 35 "${model}${effort:+ · $effort}")
+fi
+
+if [ -n "$used" ]; then
+  pct=$(printf '%.0f' "$used")
+  # 10-cell meter of box-drawing lines, which are always one cell wide: green under 50%,
+  # yellow under 80%, red after
+  if [ "$pct" -lt 50 ]; then c=32; elif [ "$pct" -lt 80 ]; then c=33; else c=31; fi
+  filled=$(( (pct + 5) / 10 )); [ "$filled" -gt 10 ] && filled=10
+  bar=""; empty=""
+  for ((i = 0; i < 10; i++)); do
+    if [ "$i" -lt "$filled" ]; then bar+="━"; else empty+="─"; fi
+  done
+  meter="  ${e}[${c}m${bar}${e}[90m${empty}${reset}  ${e}[90m${pct}%${reset}"
+fi
+
+# Lay out ----------------------------------------------------------------------
+# Right-align using the terminal width Claude Code passes in COLUMNS, minus a margin
+# for its own padding. In a narrow pane, drop the meter, then the right side, rather
+# than wrap. Without COLUMNS, just space the two sides apart.
+visible() { local s; s=$(sed "s/${e}\[[0-9;]*m//g" <<<"$1"); printf '%s' "${#s}"; }
+width=$(( ${COLUMNS:-0} - 4 ))
+right_full="${right}${meter}"
+if [ "$width" -le 0 ]; then
+  right=$right_full
+else
+  for right in "$right_full" "$right" ""; do
+    [ $(( $(visible "$left") + 2 + $(visible "$right") )) -le "$width" ] && break
+  done
+fi
+gap=$(( width - $(visible "$left") - $(visible "$right") ))
+[ "$gap" -lt 2 ] && gap=2
+[ -z "$right" ] && gap=0
+printf '%s%*s%s' "$left" "$gap" '' "$right"
