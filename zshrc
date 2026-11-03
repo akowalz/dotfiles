@@ -101,8 +101,9 @@ bindkey '^X^E' edit-command-line
 # The function tells t about your aliases and functions, then runs the command it gets
 # back here, so they work (and so do cd and export). It also adds the command to history,
 # so up-arrow brings it back.
-# (Defined before the alias, which would otherwise expand in "t() {".)
-t() {
+# (Written "function t", not "t()", so the alias below can't expand in its name when this
+# file is sourced again.)
+function t {
   local cmd_file=$(mktemp) cmd ret
   T_CMD_FILE=$cmd_file T_ALIASES=$(alias) T_FUNCTIONS=${(kj: :)functions:#[_.+-]*} \
     command t "$@"
