@@ -20,7 +20,11 @@ Plug 'junegunn/fzf.vim'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'tpope/vim-projectionist'
 Plug 'dkarter/bullets.vim'
-Plug 'yegappan/lsp'
+" Vim's LSP client; Neovim uses its own (vim/lua/nvim.lua). Each editor's plugins are
+" registered in both, so PlugClean in either keeps them, but load only where they work.
+Plug 'yegappan/lsp', has('nvim') ? { 'on': [] } : {}
+" side-by-side diffs of a branch or commit, Neovim only (dv in zshrc)
+Plug 'sindrets/diffview.nvim', has('nvim') ? {} : { 'on': [] }
 Plug 'airblade/vim-gitgutter'
 
 " Syntax highlighers (Vim's own TypeScript and Python syntax beat the old plugins)
@@ -35,9 +39,12 @@ Plug 'joshdick/onedark.vim'
 Plug 'itchyny/lightline.vim'
 call plug#end()
 
-" Packages that come with Vim: flash yanked text, follow a project's .editorconfig
-packadd! hlyank
-packadd! editorconfig
+" Packages that come with Vim: flash yanked text, follow a project's .editorconfig.
+" Neovim has both built in (vim/lua/nvim.lua).
+if !has('nvim')
+  packadd! hlyank
+  packadd! editorconfig
+endif
 " }}}
 
 " General settings ---------- {{{
@@ -49,13 +56,17 @@ set hidden
 set backspace=indent,eol,start
 set textwidth=0 nosmartindent tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 set wrap
-set dir=/tmp//
+if !has('nvim') " Neovim's swap files differ, and live in ~/.local/state/nvim
+  set dir=/tmp//
+endif
 set scrolloff=5
 set ignorecase
 set smartcase
 set wildignore+=*.pyc,*.o,*.class,*.lo,.git,vendor/*,node_modules/**,bower_components/**,*/build_gradle/*,*/build_intellij/*,*/build/*,*/cassandra_data/*
 set mouse=
-set ttymouse=
+if !has('nvim')
+  set ttymouse=
+endif
 set tags=./tags,tags,ctags
 set foldlevelstart=99
 set splitright
@@ -81,26 +92,37 @@ if &diffopt =~# 'internal'
   set diffopt+=algorithm:histogram,indent-heuristic
 endif
 set shortmess+=c
-" persistent undo, kept out of ~/.vim since that's this repo
-set undofile undodir=~/.local/state/vim/undo//
-call mkdir(expand('~/.local/state/vim/undo'), 'p', 0700)
+" ignore modelines: text near a file's start or end that looks like one ("- vim: ...") gets
+" applied as settings, which errors, and is a way in for a file you didn't write. Brewfile,
+" the one file here with a modeline, is detected as Ruby without it.
+set nomodeline
+" persistent undo, kept out of ~/.vim since that's this repo. Neovim's undo files
+" can't be read by Vim, so it keeps its own in ~/.local/state/nvim/undo.
+set undofile
+if !has('nvim')
+  set undodir=~/.local/state/vim/undo//
+  call mkdir(expand('~/.local/state/vim/undo'), 'p', 0700)
+endif
 " }}}
 
 " Appearance ---------------- {{{
 set termguicolors
-" tmux's $TERM (screen-256color) doesn't tell vim how to send true color
-if &term =~# '^\%(screen\|tmux\)'
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+" Terminal codes. Neovim works these out itself, and already has the same cursor shapes.
+if !has('nvim')
+  " tmux's $TERM (screen-256color) doesn't tell vim how to send true color
+  if &term =~# '^\%(screen\|tmux\)'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  endif
+  " curly, colored underlines (for LSP errors)
+  let &t_Cs = "\<Esc>[4:3m"
+  let &t_Ce = "\<Esc>[4:0m"
+  let &t_8u = "\<Esc>[58;2;%lu;%lu;%lum"
+  " bar cursor in insert mode, underline in replace mode, block otherwise
+  let &t_SI = "\<Esc>[6 q"
+  let &t_SR = "\<Esc>[4 q"
+  let &t_EI = "\<Esc>[2 q"
 endif
-" curly, colored underlines (for LSP errors)
-let &t_Cs = "\<Esc>[4:3m"
-let &t_Ce = "\<Esc>[4:0m"
-let &t_8u = "\<Esc>[58;2;%lu;%lu;%lum"
-" bar cursor in insert mode, underline in replace mode, block otherwise
-let &t_SI = "\<Esc>[6 q"
-let &t_SR = "\<Esc>[4 q"
-let &t_EI = "\<Esc>[2 q"
 
 set background=dark
 
@@ -126,8 +148,25 @@ function! s:OnedarkExtras()
   call onedark#set_highlight('LspDiagInlineWarning', { 'sp': l:colors.yellow, 'gui': 'undercurl', 'cterm': 'undercurl' })
   call onedark#set_highlight('LspDiagVirtualTextError', { 'fg': l:colors.red })
   call onedark#set_highlight('LspDiagVirtualTextWarning', { 'fg': l:colors.yellow })
+  " the same for Neovim's built-in LSP
+  call onedark#set_highlight('DiagnosticUnderlineError', { 'sp': l:colors.red, 'gui': 'undercurl', 'cterm': 'undercurl' })
+  call onedark#set_highlight('DiagnosticUnderlineWarn', { 'sp': l:colors.yellow, 'gui': 'undercurl', 'cterm': 'undercurl' })
+  call onedark#set_highlight('DiagnosticVirtualTextError', { 'fg': l:colors.red })
+  call onedark#set_highlight('DiagnosticVirtualTextWarn', { 'fg': l:colors.yellow })
   " lines the branch changed (vim/plugin/branchsigns.vim)
   call onedark#set_highlight('BranchSign', { 'fg': l:colors.blue })
+  " diffs keep their syntax colors: a dim tint behind changed lines, where One Dark
+  " paints them solid with black text. DiffText marks the changed words within a line.
+  highlight DiffAdd    gui=NONE guifg=NONE    guibg=#1c3022 cterm=NONE ctermfg=NONE ctermbg=22
+  highlight DiffChange gui=NONE guifg=NONE    guibg=#1a2535 cterm=NONE ctermfg=NONE ctermbg=17
+  highlight DiffText   gui=NONE guifg=NONE    guibg=#2b4366 cterm=NONE ctermfg=NONE ctermbg=24
+  highlight DiffDelete gui=NONE guifg=#5c3a3f guibg=#2c1a1d cterm=NONE ctermfg=52   ctermbg=NONE
+  " diffview (vim/lua/nvim.lua) shows a changed line GitHub-style instead: red with the
+  " old words brighter on the left, green with the new words brighter on the right
+  highlight DiffChangeOld gui=NONE guifg=NONE guibg=#2c1a1d cterm=NONE ctermfg=NONE ctermbg=52
+  highlight DiffTextOld   gui=NONE guifg=NONE guibg=#5a2a31 cterm=NONE ctermfg=NONE ctermbg=88
+  highlight DiffChangeNew gui=NONE guifg=NONE guibg=#1c3022 cterm=NONE ctermfg=NONE ctermbg=22
+  highlight DiffTextNew   gui=NONE guifg=NONE guibg=#2a5a36 cterm=NONE ctermfg=NONE ctermbg=28
 endfunction
 
 " silent!: on a fresh install, onedark isn't there until PlugInstall runs
@@ -151,6 +190,25 @@ augroup write_on_leave_insert
   autocmd InsertLeave * if !(@% == '') | update | endif
 augroup END
 
+" Reload files that changed on disk (say, edited by Claude Code) without asking, unless they
+" have unsaved edits: when vim gets focus or enters a buffer, and every second in normal mode
+set autoread
+augroup reload_changed_files
+  autocmd!
+  autocmd FocusGained,BufEnter * silent! checktime
+augroup END
+
+function! s:CheckTime(timer) abort
+  if mode() ==# 'n' && getcmdwintype() ==# ''
+    silent! checktime
+  endif
+endfunction
+
+" once, even when vimrc is sourced again (<Leader>vc)
+if !exists('s:checktime_timer')
+  let s:checktime_timer = timer_start(1000, function('s:CheckTime'), { 'repeat': -1 })
+endif
+
 " Set filetype to javascript for js.snap files
 augroup filetype_for_js_snap_file
   autocmd!
@@ -162,6 +220,56 @@ augroup filetype_for_gitconfig
   autocmd!
   autocmd BufNewFile,BufRead *gitconfig set filetype=dosini
 augroup END
+
+" Markdown wraps at 100 characters as you type, with a list item's wrapped lines indented
+" under its text, and reflows a paragraph as you edit it. Code blocks are never touched.
+" Lines vim wraps end in a space, and only those join up when reflowing (formatoptions a,
+" w), so lines you broke yourself stay as they are. Trailing spaces aren't shown (·) here,
+" since every wrapped line has one. gq (say, gqap) reflows by hand.
+augroup markdown_wrap
+  autocmd!
+  autocmd FileType markdown setlocal textwidth=100 formatexpr=MarkdownFormat() formatoptions+=aw
+  autocmd FileType markdown setlocal listchars=tab:»\ ,nbsp:␣
+augroup END
+
+" Vim's own formatting, minus fenced code blocks
+function! MarkdownFormat() abort
+  let l:in_code = s:CodeFenceLines()
+  " wrapping while typing (v:char is the typed character; it's empty for gq)
+  if v:char !=# ''
+    return l:in_code[v:lnum] ? 0 : 1
+  endif
+  " gq over lines: format each run outside code blocks, bottom up so line numbers hold
+  let l:last = v:lnum + v:count - 1
+  let l:runs = []
+  for l:lnum in range(v:lnum, l:last)
+    if l:in_code[l:lnum]
+      continue
+    elseif !empty(l:runs) && l:runs[-1][1] == l:lnum - 1
+      let l:runs[-1][1] = l:lnum
+    else
+      call add(l:runs, [l:lnum, l:lnum])
+    endif
+  endfor
+  setlocal formatexpr=
+  for [l:from, l:to] in reverse(l:runs)
+    execute 'keepjumps normal! ' . l:from . 'Ggq' . l:to . 'G'
+  endfor
+  setlocal formatexpr=MarkdownFormat()
+  return 0
+endfunction
+
+" For each line number, whether it's in a fenced code block (``` or ~~~), fences included
+function! s:CodeFenceLines() abort
+  let l:in_code = [0]
+  let l:inside = 0
+  for l:line in getline(1, '$')
+    let l:fence = l:line =~# '^\s*\%(```\|\~\~\~\)'
+    call add(l:in_code, l:inside || l:fence)
+    let l:inside = l:fence ? !l:inside : l:inside
+  endfor
+  return l:in_code
+endfunction
 
 augroup filetype_vim
   autocmd!
@@ -230,6 +338,9 @@ function! LightlineFullPath()
   return expand('%')
 endfunction
 
+" Markdown indents by 2 like everything else; Vim's markdown settings would make it 4
+let g:markdown_recommended_style = 0
+
 " Bullets: <Leader>x toggles a checkbox, or adds one to a line without it
 let g:bullets_custom_mappings = [
       \ ['nmap', '<Leader>x', '<Plug>(todo-toggle)'],
@@ -258,13 +369,13 @@ let g:gitgutter_preview_win_floating = 1
 " Its bars are uncommitted edits; thinner blue bars mark the rest of what the branch
 " changed since it left master (vim/plugin/branchsigns.vim)
 
-" LSP: diagnostics show as a curly underline plus the message after the line,
-" leaving the sign column to git. Completion stays manual (<C-x><C-o>).
+" LSP: diagnostics show as a curly underline, leaving the sign column to git. Their messages
+" stay out of the way: <Leader>d shows the one on this line. Completion stays manual (<C-x><C-o>).
 let s:lsp_options = {
       \ 'autoComplete': v:false,
       \ 'omniComplete': v:true,
       \ 'showDiagWithSign': v:false,
-      \ 'showDiagWithVirtualText': v:true,
+      \ 'showDiagWithVirtualText': v:false,
       \ 'diagVirtualTextAlign': 'after',
       \ 'diagVirtualTextWrap': 'truncate',
       \ 'echoSignature': v:true,
@@ -273,7 +384,7 @@ let s:lsp_options = {
       \ }
 
 " The servers come from the Brewfile (sourcekit-lsp comes with Xcode); a
-" missing one is skipped.
+" missing one is skipped. Neovim's built-in LSP reads this same list (vim/lua/nvim.lua).
 "
 " JavaScript and TypeScript: in a project whose own TypeScript has tsserver
 " (TypeScript 6 and older), typescript-language-server runs it, and Vue's
@@ -282,7 +393,7 @@ let s:lsp_options = {
 " own language server.
 let s:tsserver = 'node_modules/typescript/lib/tsserver.js'
 let s:vue_language_server = $HOMEBREW_PREFIX . '/opt/vue-language-server/libexec/lib/node_modules/@vue/language-server'
-let s:lsp_servers = [
+let g:lsp_servers = [
       \ { 'name': 'typescript-language-server',
       \   'path': 'typescript-language-server', 'args': ['--stdio'],
       \   'filetype': ['javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue'],
@@ -313,8 +424,13 @@ let s:lsp_servers = [
 augroup lsp_setup
   autocmd!
   autocmd User LspSetup call LspOptionsSet(s:lsp_options)
-  autocmd User LspSetup call LspAddServer(s:lsp_servers)
+  autocmd User LspSetup call LspAddServer(g:lsp_servers)
 augroup END
+
+" Neovim's side: its LSP, yank flash and diffview (vim/lua/nvim.lua)
+if has('nvim')
+  lua require('nvim')
+endif
 " }}}
 
 " Mappings ------------------ {{{
@@ -326,6 +442,12 @@ nnoremap \\ <NOP>
 " Insert mode mappings
 " Exit insert mode with jk.
 inoremap jk <ESC>
+
+" Shift-Tab outdents: the line in insert mode (via <C-d>, which bullets.vim makes outdent a
+" list item properly in markdown), the line in normal mode, the selection in visual mode
+imap <S-Tab> <C-d>
+nnoremap <S-Tab> <<
+xnoremap <S-Tab> <gv
 
 " Allow moving between wrapped lines.
 nnoremap j gj
@@ -342,6 +464,10 @@ nnoremap <Leader>w :write<CR>
 
 " Disable ex mode
 nnoremap Q <NOP>
+j
+if has('nvim')
+  silent! nunmap Y
+endif
 
 " Toggle paste mode and enter insert mode with <Leader>pp
 nnoremap <Leader>pp :set paste!<CR>
@@ -417,7 +543,7 @@ nnoremap [q <Cmd>cprevious<CR>
 " <Leader>gm turn the branch's signs in the gutter off and on
 nnoremap <Leader>gm <Cmd>call BranchSignsToggle()<CR>
 
-" LSP, in buffers a language server is attached to:
+" LSP, in buffers a language server is attached to (Neovim maps the same keys in vim/lua/nvim.lua):
 " gd definition, gr references, K docs, [d and ]d previous/next problem,
 " <Leader>d the problem on this line, <Leader>rn rename, <Leader>ca code action
 augroup lsp_mappings

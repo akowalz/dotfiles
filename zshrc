@@ -25,6 +25,13 @@ gv() {
   print -r -- "$diff" | diffnav
 }
 
+# dv: review changes side by side in Neovim's diffview.nvim (vim/lua/nvim.lua).
+# Arguments go to :DiffviewOpen, e.g. dv master... for the branch or dv HEAD~3. q quits.
+dv() {
+  # diffview opens in a tab of its own; tabonly drops the empty one nvim started with
+  nvim -c 'autocmd User DiffviewViewClosed quitall' -c "DiffviewOpen $*" -c tabonly
+}
+
 # gdw: gv that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
 alias gdw='diffnav --watch --watch-cmd "git diff-all HEAD"'
 
@@ -36,7 +43,9 @@ alias dc='docker compose'
 
 alias tf='terraform'
 
-alias vi='vim'
+# Neovim is the editor; plain Vim is still there as `command vim`, on the same config
+alias vi='nvim'
+alias vim='nvim'
 
 alias ll='ls -al'
 alias l='fc -e -' # run last command
@@ -74,7 +83,7 @@ setopt hist_reduce_blanks
 
 setopt interactive_comments # allow "# comments" at the prompt
 
-# Key bindings. Emacs mode, like bash; zsh would pick vi mode because EDITOR=vim.
+# Key bindings. Emacs mode, like bash; zsh would pick vi mode because EDITOR=nvim.
 bindkey -e
 bindkey '^U' backward-kill-line  # delete to start of line, like bash (zsh deletes the whole line)
 WORDCHARS=${WORDCHARS//\/}       # Ctrl+W / Alt+Backspace stop at "/"
@@ -199,7 +208,7 @@ boop() {
   return code
 }
 
-export EDITOR=vim
+export EDITOR=nvim
 
 # Tool configs and path adjustments (some of these may not be very cross-platform)
 # ~/.local/bin holds Claude Code's native install

@@ -16,6 +16,7 @@ brew "diffnav" # diff viewer with a file tree (gv in zshrc)
 brew "tmux"
 
 brew "vim" # newer than macOS's, and built with the internal diff (histogram diffs)
+brew "neovim" # the editor (EDITOR, vi and vim in zshrc), reading vimrc through nvim.vim
 
 # vim: language servers for its LSP plugin (vimrc)
 brew "typescript" # TypeScript 7's own server, outside projects with an older TypeScript

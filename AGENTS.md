@@ -9,9 +9,11 @@ Personal dotfiles for macOS: zsh, vim, tmux, git, cmux/Ghostty, plus small scrip
 `tmux.conf`, `vim/`, `vimrc`. It also links each script in `bin/` into a real `~/bin` directory, so other tools that install into `~/bin` stay out of this repo.
 Claude Code's settings (`~/.claude/settings.json`) are deliberately not tracked: Claude Code saves them by
 replacing the file, which turns a symlink back into a plain file.
+Its status line script is tracked, though: `bin/claude-statusline`, which that settings file runs as `~/bin/claude-statusline`.
 cmux's settings live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination).
 `ghostty.conf` is linked to `~/.config/ghostty/config`; cmux reads it for terminal behavior.
 `diffnav.yml` is linked to `~/.config/diffnav/config.yml`.
+`nvim.vim` is linked to `~/.config/nvim/init.vim`. Neovim is the editor (`EDITOR`, and `vi`/`vim` are aliases for it), and it reads `vim/` and `vimrc`, which still work in plain Vim. Keep them working in both: Neovim-only parts go behind `has('nvim')` in vimrc or in `vim/lua/nvim.lua`, and Vim-only parts behind `!has('nvim')`.
 
 - It never overwrites anything. A file already at a destination (say, a `~/.zshrc` an installer wrote) moves aside to `<dest>.pre-dotfiles`, and the run ends by listing them.
 - It removes links into this repo whose file is gone (say, `~/.bashrc` from before the switch to zsh), and leaves other broken links alone.
@@ -38,7 +40,7 @@ Add macOS settings (`defaults write` and the like) to `macos.sh`, grouped under 
 
 - Shell files: `zsh -n <file>` (`bash -n` for the bash scripts), then `source ~/.zshrc` (or open a new shell).
 - tmux: `tmux source-file ~/.tmux.conf`.
-- vim: `vim +PlugInstall +qall` after changing plugins, then open vim and check for startup errors.
+- vim plugins: run `nvim +PlugInstall +qall` after changing them, then open nvim and `command vim` and check both for startup errors.
 - Brewfile: `brew bundle check`.
 - `setup.sh` is safe to re-run because it skips links that are already in place. However, each run still re-runs PlugInstall and `macos.sh`.
 - macOS settings: `bash -n macos.sh`, then `./macos.sh` on its own. Check a value with `defaults read <domain> <key>`.
