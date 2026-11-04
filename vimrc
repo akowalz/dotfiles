@@ -92,6 +92,12 @@ if &diffopt =~# 'internal'
   set diffopt+=algorithm:histogram,indent-heuristic
 endif
 set shortmess+=c
+" Neovim's defaults, so Vim behaves the same: a new line keeps the indent of the one before
+" (which also indents a numbered list item's wrapped lines), joining lines drops a comment
+" leader, and one space after a period when joining lines (J, gq), not two
+set autoindent
+set formatoptions+=j
+set nojoinspaces
 " ignore modelines: text near a file's start or end that looks like one ("- vim: ...") gets
 " applied as settings, which errors, and is a way in for a file you didn't write. Brewfile,
 " the one file here with a modeline, is detected as Ruby without it.
@@ -321,12 +327,15 @@ augroup fern_arrows
   autocmd FileType fern nmap <buffer><nowait> <Left> <Plug>(fern-action-collapse)
 augroup END
 
-" Lightline
+" Lightline: lineinfo is line/total lines:column, say 123/437:5
 let g:lightline = {
       \ 'colorscheme': 'onedark',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+      \ },
+      \ 'component': {
+      \   'lineinfo': '%l/%L:%v',
       \ },
       \ 'component_function': {
       \   'filename': 'LightlineFullPath',
@@ -496,6 +505,65 @@ nnoremap <Leader>"" m'F'r"f'r"`'
 
 " Change double quotes to single quotes with <Leader>''
 nnoremap <Leader>'' m'F"r'f"r'`'
+
+" Reflow prose to 'textwidth', keeping the cursor in place: <Leader>rf the paragraph or the
+" selection, <Leader>rF every paragraph in the file with a line over the width, so paragraphs
+" of short lines stay as written. In markdown, text, and commit messages; markdown's code blocks
+" are left alone (MarkdownFormat).
+augroup reflow_mappings
+  autocmd!
+  autocmd FileType markdown,text,gitcommit call s:ReflowMappings()
+augroup END
+
+function! s:ReflowMappings() abort
+  nnoremap <buffer> <Leader>rf <Cmd>call <SID>ReflowParagraph()<CR>
+  nnoremap <buffer> <Leader>rF <Cmd>call <SID>ReflowFile()<CR>
+  xnoremap <buffer> <Leader>rf <Esc><Cmd>call <SID>ReflowLines(line("'<"), line("'>"))<CR>
+endfunction
+
+" Join each paragraph's lines into one, then wrap it. Wrapping alone would strand the end of a
+" long line on a line of its own, since markdown only joins lines vim wrapped (formatoptions w);
+" the second pass wraps with w on, so the new lines are marked as wrapped and keep reflowing.
+function! s:ReflowLines(first, last) abort
+  let l:view = winsaveview()
+  let [l:textwidth, l:formatoptions, l:total] = [&l:textwidth, &l:formatoptions, line('$')]
+  setlocal textwidth=10000 formatoptions-=w
+  execute 'keepjumps normal! ' . a:first . 'Ggq' . a:last . 'G'
+  let l:last = a:last - (l:total - line('$'))
+  let [&l:textwidth, &l:formatoptions] = [l:textwidth, l:formatoptions]
+  execute 'keepjumps normal! ' . a:first . 'Ggq' . l:last . 'G'
+  call winrestview(l:view)
+endfunction
+
+" The paragraph under the cursor: the lines between blank ones
+function! s:ReflowParagraph() abort
+  if getline('.') =~# '^\s*$'
+    return
+  endif
+  let l:after = search('^\s*$', 'nW')
+  call s:ReflowLines(search('^\s*$', 'bnW') + 1, l:after ? l:after - 1 : line('$'))
+endfunction
+
+" Each paragraph with a line over the width, from the bottom up so line numbers hold
+function! s:ReflowFile() abort
+  let l:width = &l:textwidth ? &l:textwidth : 79
+  let l:paragraphs = []
+  let l:first = 0
+  for l:lnum in range(1, line('$') + 1)
+    let l:blank = l:lnum > line('$') || getline(l:lnum) =~# '^\s*$'
+    if !l:blank && !l:first
+      let l:first = l:lnum
+    elseif l:blank && l:first
+      call add(l:paragraphs, [l:first, l:lnum - 1])
+      let l:first = 0
+    endif
+  endfor
+  for [l:from, l:to] in reverse(l:paragraphs)
+    if max(map(range(l:from, l:to), 'strdisplaywidth(getline(v:val))')) > l:width
+      call s:ReflowLines(l:from, l:to)
+    endif
+  endfor
+endfunction
 
 " Fold/Unfold with <Leader>ff
 nnoremap <Leader>ff za
