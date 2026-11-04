@@ -22,7 +22,11 @@ reset="${e}[0m"
 block() { printf '%s' "${e}[${1}m${2}${reset}"; }
 
 # Left -------------------------------------------------------------------------
-left=$(block 34 "${cwd/#$HOME/\~}")
+# just the directory's name, after a folder icon; ~ for the home directory itself.
+# Icons are Nerd Font symbols, which Ghostty has built in, written as escape codes.
+dir=${cwd%/}; dir=${dir##*/}
+[ "$cwd" = "$HOME" ] && dir="~"
+left=$(block 34 $'\uf115'" ${dir:-/}") # folder (open, outline)
 
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
   branch=$(git -C "$cwd" symbolic-ref --short -q HEAD || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
@@ -33,8 +37,7 @@ if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
   elif [ -f "$gitdir/REVERT_HEAD" ]; then branch+=" (revert)"
   elif [ -f "$gitdir/BISECT_LOG" ]; then branch+=" (bisect)"
   fi
-  #  is the Powerline branch symbol, which Ghostty has built in
-  left+=" $(block 36 $''" $branch")"
+  left+=" $(block 36 $'\ue725'" $branch")" # git branch
 
   # git-mess prints tokens such as "●2 ✚3 −1 ✖1 ?4 ↑1↓2"; color each by its symbol
   for tok in $(cd "$cwd" && git-mess 2>/dev/null); do
