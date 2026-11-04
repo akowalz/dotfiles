@@ -23,7 +23,7 @@ Plug 'dkarter/bullets.vim'
 " Vim's LSP client; Neovim uses its own (vim/lua/nvim.lua). Each editor's plugins are
 " registered in both, so PlugClean in either keeps them, but load only where they work.
 Plug 'yegappan/lsp', has('nvim') ? { 'on': [] } : {}
-" side-by-side diffs of a branch or commit, Neovim only (dv in zshrc)
+" side-by-side diffs of a branch or commit, Neovim only (gdv in zshrc)
 Plug 'sindrets/diffview.nvim', has('nvim') ? {} : { 'on': [] }
 Plug 'airblade/vim-gitgutter'
 

@@ -11,13 +11,53 @@ alias gp='git pull --prune'
 # git diff, including untracked files as new (bin/git-diff-all). Takes git diff's arguments.
 alias gd='git diff-all'
 
-# gv: browse everything changed since the last commit (staged, unstaged and new files) in diffnav,
-# one file at a time from a file tree. Arguments replace HEAD, e.g. gv --staged or gv main.
-gv() {
-  local diff args=("$@")
-  # no HEAD yet in a brand-new repo
-  (( $# )) || ! git rev-parse -q --verify HEAD >/dev/null || args=(HEAD)
-  diff=$(git diff-all "${args[@]}") || return
+# Diff viewers: gd + where it opens. gdv vim, gdt terminal, gdw terminal and watching,
+# gdgh GitHub (bin/gdgh). They take the same arguments:
+#   (none)   uncommitted changes, new files included
+#   b        the whole branch: everything since it left main, uncommitted changes included
+#   other    passed to git, e.g. gdt HEAD~3 or gdt --staged
+# gdgh always shows the branch, as pushed, since GitHub can't see anything else.
+
+# The commit where this branch left the main branch (origin/HEAD, else main or master), the
+# same base as BranchBase in vim/plugin/branchsigns.vim.
+_branch_base() {
+  local main
+  for main in origin/HEAD main master; do
+    git merge-base HEAD $main 2>/dev/null && return
+  done
+  echo "No main or master branch to compare with." >&2
+  return 1
+}
+
+# Sets reply to a diff viewer's arguments: b becomes the branch's base, and no arguments
+# become HEAD (not in a brand-new repo, which has none). With "keep-empty" first, no arguments
+# stay none, for diffview, whose default already covers uncommitted changes.
+_diff_args() {
+  local keep_empty
+  [[ $1 == keep-empty ]] && { keep_empty=1; shift; }
+  reply=("$@")
+  if [[ $1 == b ]]; then
+    local base
+    base=$(_branch_base) || return
+    reply=($base "${@:2}")
+  elif (( ! $# )) && [[ -z $keep_empty ]] && git rev-parse -q --verify HEAD >/dev/null; then
+    reply=(HEAD)
+  fi
+}
+
+# gdv: side by side in Neovim's diffview.nvim (vim/lua/nvim.lua). q quits.
+gdv() {
+  local reply
+  _diff_args keep-empty "$@" || return
+  # diffview opens in a tab of its own; tabonly drops the empty one nvim started with
+  nvim -c 'autocmd User DiffviewViewClosed quitall' -c "DiffviewOpen ${reply[*]}" -c tabonly
+}
+
+# gdt: in diffnav, one file at a time from a file tree.
+gdt() {
+  local reply diff
+  _diff_args "$@" || return
+  diff=$(git diff-all "${reply[@]}") || return
   if [[ -z $diff ]]; then
     echo "No changes."
     return
@@ -25,15 +65,12 @@ gv() {
   print -r -- "$diff" | diffnav
 }
 
-# dv: review changes side by side in Neovim's diffview.nvim (vim/lua/nvim.lua).
-# Arguments go to :DiffviewOpen, e.g. dv master... for the branch or dv HEAD~3. q quits.
-dv() {
-  # diffview opens in a tab of its own; tabonly drops the empty one nvim started with
-  nvim -c 'autocmd User DiffviewViewClosed quitall' -c "DiffviewOpen $*" -c tabonly
+# gdw: gdt that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
+gdw() {
+  local reply
+  _diff_args "$@" || return
+  diffnav --watch --watch-cmd "git diff-all ${(j: :)${(q)reply}}"
 }
-
-# gdw: gv that stays open and refreshes every 2 seconds, e.g. in a split next to Claude Code.
-alias gdw='diffnav --watch --watch-cmd "git diff-all HEAD"'
 
 alias bi='bundle install'
 alias be='bundle exec'

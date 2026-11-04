@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# gdgh - open GitHub's compare view for the current branch, to use GitHub as a diff viewer.
+#
+#   gdgh          compare against the repo's default branch (origin/HEAD, usually main); gdgh b too
+#   gdgh <base>   compare against another branch, say the one a stacked branch sits on
+#
+# The URL is base...branch: three dots, so GitHub diffs from where the branch forked off base.
+# A branch that's behind base shows only its own changes, with no need to rebase first.
+# GitHub only knows what's pushed, so it warns when the local branch differs from origin's
+# (unpushed commits, or a rebase not force-pushed yet).
+
+remote=origin
+
+branch=$(git symbolic-ref --quiet --short HEAD) || {
+  echo "gdgh: not on a branch" >&2
+  exit 1
+}
+
+base=$1
+[ "$base" = b ] && base= # b, "the branch", like the other gd* viewers in zshrc
+if [ -z "$base" ]; then
+  base=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" 2>/dev/null)
+  base=${base#"$remote"/}
+  # origin/HEAD is set by clone; in a repo that was init'ed and pushed, ask once to set it
+  if [ -z "$base" ] && git remote set-head "$remote" --auto >/dev/null 2>&1; then
+    base=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD")
+    base=${base#"$remote"/}
+  fi
+  base=${base:-main}
+fi
+
+if [ "$base" = "$branch" ]; then
+  echo "gdgh: $branch is the base branch; check out another branch, or pass a base" >&2
+  exit 1
+fi
+
+# git@github.com:owner/repo.git, ssh://git@github.com/owner/repo, https://github.com/owner/repo.git
+url=$(git remote get-url "$remote") || exit
+case $url in
+  git@*:*) host=${url#git@}; host=${host%%:*}; path=${url#*:} ;;
+  ssh://* | https://* | http://*)
+    rest=${url#*://}; rest=${rest#*@}
+    host=${rest%%/*}; path=${rest#*/} ;;
+  *) echo "gdgh: can't read a GitHub repo from $remote's URL: $url" >&2; exit 1 ;;
+esac
+host=${host%%:*} # drop an ssh port
+path=${path%.git}; path=${path%/}
+
+if ! git rev-parse --verify --quiet "refs/remotes/$remote/$branch" >/dev/null; then
+  echo "gdgh: $branch isn't on $remote yet; push it first: git push -u $remote $branch" >&2
+  exit 1
+fi
+
+read -r behind ahead < <(git rev-list --left-right --count "$remote/$branch...HEAD")
+if [ "$ahead" != 0 ] && [ "$behind" != 0 ]; then
+  echo "gdgh: $branch and $remote/$branch have diverged (rebased?); GitHub shows the pushed one" >&2
+  echo "      push with: git push --force-with-lease" >&2
+elif [ "$ahead" != 0 ]; then
+  echo "gdgh: $ahead commit(s) not pushed; GitHub shows $remote/$branch without them" >&2
+elif [ "$behind" != 0 ]; then
+  echo "gdgh: $remote/$branch is $behind commit(s) ahead of your local branch" >&2
+fi
+if ! git diff --quiet HEAD 2>/dev/null; then
+  echo "gdgh: uncommitted changes aren't on GitHub" >&2
+fi
+
+link="https://$host/$path/compare/$base...$branch"
+echo "$link"
+open "$link"

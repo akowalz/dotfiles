@@ -11,7 +11,7 @@ brew "glow"  # render markdown notes in the terminal (md in zshrc)
 brew "gh"   # used by Claude Code
 brew "fzf"  # git select, zsh key bindings
 brew "git-delta" # git pager (gitconfig)
-brew "diffnav" # diff viewer with a file tree (gv in zshrc)
+brew "diffnav" # diff viewer with a file tree (gdt and gdw in zshrc)
 
 brew "tmux"
 

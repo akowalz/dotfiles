@@ -78,7 +78,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- diffview (dv in zshrc): q closes it, R refreshes it. Not there on a fresh install until
+-- diffview (gdv in zshrc): q closes it, R refreshes it. Not there on a fresh install until
 -- PlugInstall runs.
 local ok, diffview = pcall(require, 'diffview')
 if ok then
