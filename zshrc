@@ -99,7 +99,8 @@ alias md='glow -p -w 85' # read a markdown file rendered, in a pager
 alias weather='curl wttr.in/chicago'
 
 # Replace this shell with a fresh one, so removed aliases and functions go away too
-# (source only adds). Refuses while jobs are running, since exec would kill them.
+# (source only adds). A login shell stays one, so zprofile runs again too. Refuses while jobs
+# are running, since exec would kill them.
 # In cmux, it first reloads Ghostty config and cmux.json for every terminal.
 reload() {
   if [[ -n $(jobs) ]]; then
@@ -107,7 +108,7 @@ reload() {
     return 1
   fi
   [[ -n $CMUX_SOCKET_PATH ]] && cmux reload-config >/dev/null
-  exec zsh
+  if [[ -o login ]]; then exec zsh -l; else exec zsh; fi
 }
 
 # History. zsh saves none by default.
@@ -214,8 +215,46 @@ _exit_meaning_precmd() {
 # first, so $? is still the command's and not another hook's
 precmd_functions=(_exit_meaning_precmd $precmd_functions)
 
+# [↻ reload] at the right edge when a file this shell loaded has changed since it started, so
+# its aliases and functions are out of date. Only these files are loaded into the shell; bin/
+# scripts and other programs' configs are read fresh each time. (Files sourced from elsewhere,
+# like fzf's, change only with a brew upgrade.) A changed timestamp alone, from git checkout or
+# touch, doesn't count: then the checksum decides. Undoing the edit clears it again.
+zmodload -F zsh/stat b:zstat
+_rc_files=(~/.zshrc ~/.zshrc.local)
+[[ -o login ]] && _rc_files+=(~/.zprofile)
+typeset -gA _rc_mtimes _rc_sums
+# the linked file's modification time, through the symlink, into $REPLY; empty if it's missing
+_rc_mtime() { REPLY=; zstat -A REPLY +mtime -- $1 2>/dev/null }
+_rc_sum() { [[ -f $1 ]] && cksum < $1 }
+_rc_stale=
+for _rc_file in $_rc_files; do
+  _rc_mtime $_rc_file; _rc_mtimes[$_rc_file]=$REPLY
+  _rc_sums[$_rc_file]=$(_rc_sum $_rc_file)
+done
+unset _rc_file
+_rc_changed_precmd() {
+  local file REPLY
+  _rc_stale=
+  for file in $_rc_files; do
+    _rc_mtime $file
+    [[ $REPLY == $_rc_mtimes[$file] ]] && continue
+    if [[ $(_rc_sum $file) == $_rc_sums[$file] ]]; then
+      _rc_mtimes[$file]=$REPLY # same contents: don't checksum again until it changes
+    else
+      _rc_stale=1
+    fi
+  done
+}
+add-zsh-hook precmd _rc_changed_precmd
+
 setopt prompt_subst
-PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?${_exit_meaning:+ $_exit_meaning}%f)
+# The reload marker goes at the right end of the prompt's first line. RPROMPT can only go on the
+# last line, so instead the cursor jumps to the far right (999C stops at the edge), then back 9
+# columns, leaving room for the marker's 10. %{ %} tells zsh those escapes take up no space.
+# \uf021 is the Nerd Font refresh icon, which Ghostty has built in. Color 11 is bright yellow.
+_rc_marker=$'%{\e[999C\e[9D%}'"%F{11}["$'\uf021'" reload]%f"
+PROMPT='%B%F{blue}%~%f%b${vcs_info_msg_0_}${_git_mess:+ $_git_mess}%(?.. %F{red}✘ %?${_exit_meaning:+ $_exit_meaning}%f)${_rc_stale:+$_rc_marker}
 %(?.%F{magenta}.%F{red})❯%f '
 
 # boop: append to a long command to hear and see when it's done, e.g. make build ; boop
