@@ -30,7 +30,17 @@
     "notificationMessageLineLimit": 1,
     "branchVerticalLayout": false,
     "pathLastSegmentOnly": true,
-    "showPorts": false
+    "showPorts": false,
+    // open pull request and port links in the system browser, not cmux's
+    "openPullRequestLinksInCmuxBrowser": false,
+    "openPortLinksInCmuxBrowser": false
+  },
+
+  // open links in the system browser, never cmux's built-in one: links clicked
+  // in a terminal, and `open https://...` run in one
+  "browser": {
+    "openTerminalLinksInCmuxBrowser": false,
+    "interceptTerminalOpenCommandInCmuxBrowser": false
   },
 
   // name workspaces and tabs after what their Claude Code conversation is about.
