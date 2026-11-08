@@ -251,6 +251,9 @@ boop() {
 export EDITOR=nvim
 
 # Tool configs and path adjustments (some of these may not be very cross-platform)
+# Commands from gems installed with Homebrew's Ruby (e.g. trmnlp). The directory
+# is named after Ruby's version (gems/4.0.0/bin), so take the newest one.
+path=($HOMEBREW_PREFIX/lib/ruby/gems/*/bin(Nn[-1]) $path)
 # ~/.local/bin holds Claude Code's native install
 path=(/usr/local/bin $HOME/bin $HOME/.local/bin $path)
 
