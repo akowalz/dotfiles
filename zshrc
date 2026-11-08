@@ -100,11 +100,13 @@ alias weather='curl wttr.in/chicago'
 
 # Replace this shell with a fresh one, so removed aliases and functions go away too
 # (source only adds). Refuses while jobs are running, since exec would kill them.
+# In cmux, it first reloads Ghostty config and cmux.json for every terminal.
 reload() {
   if [[ -n $(jobs) ]]; then
     echo "reload: background jobs are running; finish or disown them first" >&2
     return 1
   fi
+  [[ -n $CMUX_SOCKET_PATH ]] && cmux reload-config >/dev/null
   exec zsh
 }
 
