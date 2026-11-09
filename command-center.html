@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMMAND CENTER</title>
+<style>
+  :root {
+    --bg: #0d1017;
+    --panel: #141924;
+    --panel-edge: #232a38;
+    --text: #d8dee9;
+    --muted: #7d8799;
+    --faint: #4b5468;
+    --cmux: #c678dd;
+    --shell: #61afef;
+    --git: #e5a05b;
+    --review: #98c379;
+    --key-top: #2b3242;
+    --key-bottom: #1c2130;
+    --key-edge: #3a4357;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 500px at 15% -10%, rgba(97, 175, 239, 0.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(198, 120, 221, 0.07), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font: 14px/1.45 var(--sans);
+    padding: 40px 32px 64px;
+  }
+  .wrap { max-width: 1320px; margin: 0 auto; }
+
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+  h1 {
+    margin: 0;
+    font: 800 44px/1 var(--mono);
+    letter-spacing: 0.12em;
+    background: linear-gradient(90deg, var(--shell), var(--cmux) 55%, var(--git));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tagline { margin: 10px 0 0; color: var(--muted); font-family: var(--mono); font-size: 13px; }
+  .tagline b { color: var(--text); font-weight: 600; }
+  .status { display: flex; gap: 18px; font: 12px var(--mono); color: var(--muted); }
+  .status span::before { content: "●"; margin-right: 6px; }
+  .status .s-cmux::before { color: var(--cmux); }
+  .status .s-shell::before { color: var(--shell); }
+  .status .s-git::before { color: var(--git); }
+  .status .s-review::before { color: var(--review); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 18px; align-items: start; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-top: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 18px 20px 14px;
+  }
+  .panel.cmux { --accent: var(--cmux); }
+  .panel.shell { --accent: var(--shell); }
+  .panel.git { --accent: var(--git); }
+  .panel.review { --accent: var(--review); }
+  .panel.wide { grid-column: 1 / -1; }
+
+  h2 { margin: 0 0 4px; font: 700 13px var(--mono); letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; }
+  .sub { margin: 0 0 12px; color: var(--muted); font-size: 12.5px; }
+  h3 { margin: 16px 0 6px; font: 600 11px var(--mono); letter-spacing: 0.14em; color: var(--faint); text-transform: uppercase; }
+  h3:first-of-type { margin-top: 6px; }
+
+  .row { display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 14px; align-items: center; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+  .row:last-child { border-bottom: 0; }
+  .keys { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .desc { color: var(--text); }
+  .desc em { color: var(--muted); font-style: normal; }
+
+  kbd {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; height: 24px; padding: 0 7px;
+    font: 600 12px var(--mono); color: #e8edf5;
+    background: linear-gradient(180deg, var(--key-top), var(--key-bottom));
+    border: 1px solid var(--key-edge);
+    border-radius: 6px;
+    box-shadow: 0 2px 0 #080a10, inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  kbd.mod { color: var(--accent); }
+  .then { color: var(--faint); font: 12px var(--mono); padding: 0 2px; }
+  .or { color: var(--faint); font: 11px var(--mono); padding: 0 3px; }
+
+  code {
+    font: 600 12.5px var(--mono);
+    color: var(--accent);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 5px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .desc code { color: var(--text); font-weight: 500; }
+
+  .callout {
+    margin: 4px 0 10px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    color: var(--muted); font-size: 12.5px;
+  }
+  .callout b { color: var(--text); font-weight: 600; }
+  .callout code { color: var(--accent); }
+
+  .viewers { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 6px 0 4px; }
+  .viewer { border: 1px solid var(--panel-edge); border-radius: 8px; padding: 12px; background: rgba(152,195,121,0.04); }
+  .viewer .cmd { font: 800 22px var(--mono); color: var(--review); letter-spacing: 0.02em; }
+  .viewer .cmd u { text-decoration: none; color: #fff; }
+  .viewer .where { margin: 2px 0 6px; font: 600 12px var(--mono); color: var(--text); }
+  .viewer .why { color: var(--muted); font-size: 12.5px; }
+
+  .args { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .arg { padding: 10px 12px; border: 1px dashed var(--panel-edge); border-radius: 8px; }
+  .arg code { font-size: 13px; }
+  .arg p { margin: 6px 0 0; color: var(--muted); font-size: 12.5px; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+
+  footer { margin-top: 28px; color: var(--faint); font: 12px var(--mono); text-align: center; }
+
+  @media (max-width: 860px) {
+    .cols, .args { grid-template-columns: 1fr; }
+    h1 { font-size: 34px; }
+  }
+  @media print {
+    body { background: #fff; color: #111; padding: 0; }
+    .panel { break-inside: avoid; background: #fff; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>COMMAND CENTER</h1>
+    <p class="tagline">cmux <b>›</b> zsh <b>›</b> git <b>›</b> review. The keys worth knowing by heart.</p>
+  </div>
+  <div class="status">
+    <span class="s-cmux">cmux</span>
+    <span class="s-shell">shell</span>
+    <span class="s-git">git</span>
+    <span class="s-review">review</span>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- CMUX -->
+  <section class="panel cmux">
+    <h2>cmux</h2>
+    <p class="sub">tmux-style keys behind a <kbd class="mod">⌃</kbd><kbd>A</kbd> prefix: press it, let go, then the key.</p>
+    <div class="callout"><b>Workspace</b> (sidebar entry) › <b>pane</b> (split) › <b>tab</b></div>
+
+    <h3>Workspaces</h3>
+    <div class="row"><div class="keys"><kbd class="mod">⌘</kbd><kbd>N</kbd></div><div class="desc">New workspace <em>(opens as two side-by-side panes)</em></div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌘</kbd><kbd>J</kbd><span class="or">/</span><kbd class="mod">⌘</kbd><kbd>K</kbd></div><div class="desc">Next / previous workspace</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>A</kbd></div><div class="desc">Jump back to the last one</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd class="mod">⇧</kbd><kbd>L</kbd></div><div class="desc">Go to a workspace</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>,</kbd></div><div class="desc">Rename it</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd class="mod">⇧</kbd><kbd>←</kbd><span class="or">/</span><kbd>→</kbd></div><div class="desc">Move it up / down the sidebar</div></div>
+
+    <h3>Panes</h3>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>H</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd></div><div class="desc">Focus the pane left / down / up / right</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>O</kbd></div><div class="desc">Focus the next pane</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>V</kbd></div><div class="desc">Split right <em>(like vim's :vsplit)</em></div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>S</kbd></div><div class="desc">Split down</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>A</kbd><span class="then">›</span><kbd>Z</kbd></div><div class="desc">Zoom the pane full size, and back</div></div>
+
+    <h3>Tabs &amp; more</h3>
+    <div class="row"><div class="keys"><kbd class="mod">⌘</kbd><kbd>T</kbd></div><div class="desc">New tab in this pane</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>L</kbd></div><div class="desc">Clear the screen</div></div>
+  </section>
+
+  <!-- SHELL -->
+  <section class="panel shell">
+    <h2>Shell</h2>
+    <p class="sub">zsh, with grey autosuggestions.</p>
+
+    <h3>Keys</h3>
+    <div class="row"><div class="keys"><kbd>Tab</kbd></div><div class="desc">Take the grey suggestion, or complete when there's none</div></div>
+    <div class="row"><div class="keys"><kbd>→</kbd><span class="or">or</span><kbd class="mod">⌃</kbd><kbd>E</kbd></div><div class="desc">Take the grey suggestion</div></div>
+    <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>R</kbd></div><div class="desc">Fuzzy-search command history</div></div>
+
+    <h3>Claude</h3>
+    <div class="row"><div class="keys"><code>claude -c</code></div><div class="desc">Continue the last conversation</div></div>
+    <div class="row"><div class="keys"><code>claude -r</code></div><div class="desc">Pick a past conversation to resume</div></div>
+    <div class="row"><div class="keys"><code>claude --effort low</code></div><div class="desc">Effort for this session only <em>(<code>/effort</code> changes the default)</em></div></div>
+
+    <h3>Aliases &amp; scripts</h3>
+    <div class="row"><div class="keys"><code>rl</code></div><div class="desc">Reload the shell, plus cmux &amp; Ghostty config</div></div>
+    <div class="row"><div class="keys"><code>l</code></div><div class="desc">Run the last command again</div></div>
+    <div class="row"><div class="keys"><code>t …</code></div><div class="desc">Describe a command in English; Claude writes and runs it</div></div>
+    <div class="row"><div class="keys"><code>… ; boop</code></div><div class="desc">Sound + notification when a long command finishes</div></div>
+    <div class="row"><div class="keys"><code>mkcd</code></div><div class="desc">Make a directory and cd into it</div></div>
+    <div class="row"><div class="keys"><code>cpwd</code></div><div class="desc">Copy the current directory's path</div></div>
+    <div class="row"><div class="keys"><code>ll</code></div><div class="desc"><code>ls -al</code></div></div>
+    <div class="row"><div class="keys"><code>j</code></div><div class="desc">Pretty-print JSON: <code>curl … | j</code></div></div>
+    <div class="row"><div class="keys"><code>md</code></div><div class="desc">Read a markdown file, rendered</div></div>
+    <div class="row"><div class="keys"><code>dps</code></div><div class="desc">Docker containers, condensed <em>(<code>-a</code> for stopped too)</em></div></div>
+    <div class="row"><div class="keys"><code>dc</code></div><div class="desc"><code>docker compose</code></div></div>
+    <div class="row"><div class="keys"><code>murder</code></div><div class="desc">Stop a process politely, then less so</div></div>
+    <div class="row"><div class="keys"><code>vi</code><span class="or">/</span><code>vim</code></div><div class="desc">nvim</div></div>
+
+    <div class="callout" style="margin-top:14px"><b style="color:#e5c07b">[↻ reload]</b> at the top right means zshrc changed since this shell started. Run <code>rl</code>.</div>
+  </section>
+
+  <!-- GIT -->
+  <section class="panel git">
+    <h2>Git</h2>
+    <p class="sub"><code>g</code> is git: <code>g st</code>, <code>g sel</code>, …</p>
+    <h3>Everyday</h3>
+    <div class="row"><div class="keys"><code>st</code></div><div class="desc">Status</div></div>
+    <div class="row"><div class="keys"><code>sel</code></div><div class="desc">Pick a branch with fzf, newest first, and check it out</div></div>
+    <div class="row"><div class="keys"><code>co -</code><span class="or">/</span><code>co -b</code></div><div class="desc">Back to the previous branch / start a new one</div></div>
+    <div class="row"><div class="keys"><code>gp</code></div><div class="desc">Pull and prune deleted branches <em>(no <code>g</code>)</em></div></div>
+    <h3>Branches</h3>
+    <div class="row"><div class="keys"><code>pu</code></div><div class="desc">Push this branch and set its upstream</div></div>
+    <div class="row"><div class="keys"><code>sync</code></div><div class="desc">Update main, then rebase onto it</div></div>
+    <div class="row"><div class="keys"><code>rbm</code></div><div class="desc">Fetch main, interactive rebase onto it</div></div>
+    <div class="row"><div class="keys"><code>rbi</code></div><div class="desc">Interactive rebase of just this branch's commits</div></div>
+    <div class="row"><div class="keys"><code>rbc</code></div><div class="desc">Rebase --continue</div></div>
+    <h3>Commits</h3>
+    <div class="row"><div class="keys"><code>amend</code></div><div class="desc">Add staged changes to the last commit</div></div>
+    <div class="row"><div class="keys"><code>redo</code></div><div class="desc">Add everything, amend, force-push <em>(with lease)</em></div></div>
+    <div class="row"><div class="keys"><code>pushfix</code></div><div class="desc">Fixup commit, then push</div></div>
+    <div class="row"><div class="keys"><code>pile</code></div><div class="desc">Stash, untracked files included</div></div>
+    <div class="row"><div class="keys"><code>staged</code></div><div class="desc">Diff of what's staged</div></div>
+    <div class="row"><div class="keys"><code>copy-sha</code></div><div class="desc">Copy HEAD's SHA</div></div>
+    <div class="row"><div class="keys"><code>reset-to-origin</code></div><div class="desc">Throw away local commits, match origin</div></div>
+  </section>
+
+  <!-- REVIEW -->
+  <section class="panel review wide">
+    <h2>Review workflow</h2>
+    <p class="sub">Every diff viewer is <code>gd</code> + where it opens.</p>
+
+    <div class="viewers">
+      <div class="viewer"><div class="cmd">gd<u>v</u></div><div class="where">vim · diffview</div><div class="why">Side by side, edit while you review</div></div>
+      <div class="viewer"><div class="cmd">gd<u>t</u></div><div class="where">terminal · diffnav</div><div class="why">A quick look, file tree on the left</div></div>
+      <div class="viewer"><div class="cmd">gd<u>w</u></div><div class="where">terminal · watching</div><div class="why">Live, in a split next to Claude Code</div></div>
+      <div class="viewer"><div class="cmd">gd<u>gh</u></div><div class="where">GitHub · compare</div><div class="why">The branch the way a reviewer sees it</div></div>
+    </div>
+
+    <div class="args">
+      <div class="arg"><code>gdt</code><p>Nothing: uncommitted changes</p></div>
+      <div class="arg"><code>gdt b</code><p>The whole <b>b</b>ranch since it left main, uncommitted included</p></div>
+      <div class="arg"><code>gdt HEAD~3</code><p>Anything else goes straight to git</p></div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <h3>In gdv (diffview)</h3>
+        <div class="row"><div class="keys"><kbd>Tab</kbd><span class="or">/</span><kbd class="mod">⇧</kbd><kbd>Tab</kbd></div><div class="desc">Next / previous file</div></div>
+        <div class="row"><div class="keys"><kbd>]</kbd><kbd>]</kbd><span class="or">/</span><kbd>[</kbd><kbd>[</kbd></div><div class="desc">Next / previous change</div></div>
+        <div class="row"><div class="keys"><kbd>Space</kbd><kbd>E</kbd></div><div class="desc">Back to the file list</div></div>
+        <div class="row"><div class="keys"><kbd class="mod">⇧</kbd><kbd>R</kbd></div><div class="desc">Refresh</div></div>
+        <div class="row"><div class="keys"><kbd>G</kbd><kbd>?</kbd></div><div class="desc">All the keys</div></div>
+        <div class="row"><div class="keys"><kbd>Q</kbd></div><div class="desc">Quit</div></div>
+      </div>
+      <div>
+        <h3>In gdt / gdw (diffnav)</h3>
+        <div class="row"><div class="keys"><kbd>N</kbd><span class="or">/</span><kbd>P</kbd></div><div class="desc">Next / previous file</div></div>
+        <div class="row"><div class="keys"><kbd>J</kbd><span class="or">/</span><kbd>K</kbd></div><div class="desc">Move in the file tree</div></div>
+        <div class="row"><div class="keys"><kbd class="mod">⌃</kbd><kbd>D</kbd><span class="or">/</span><kbd class="mod">⌃</kbd><kbd>U</kbd></div><div class="desc">Half a page down / up</div></div>
+        <div class="row"><div class="keys"><kbd>T</kbd></div><div class="desc">Jump to a file by name</div></div>
+        <div class="row"><div class="keys"><kbd>S</kbd></div><div class="desc">Unified ↔ side by side</div></div>
+        <div class="row"><div class="keys"><kbd>O</kbd><span class="or">/</span><kbd>Y</kbd></div><div class="desc">Open in nvim / copy the path</div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Keys are lowercase unless ⇧ is shown · ⌘ cmd · ⌃ ctrl · ⇧ shift</footer>
+</div>
+</body>
+</html>

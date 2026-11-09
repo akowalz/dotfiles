@@ -50,6 +50,22 @@ what each one does.
   employer details, or machine-specific paths and state. Anything that only makes sense on one 
   machine goes in an untracked local file.
 
+## Command center
+
+`command-center.html` is the user's cheat sheet for this setup: cmux shortcuts, shell keys,
+aliases and scripts, git aliases, Claude Code flags, and the review workflow (`gd*` and the
+diffview and diffnav keys). It isn't linked anywhere; it's opened in a browser.
+
+- **Keep it accurate.** After every change, check whether the page lists anything the change
+  renamed, removed, rebound or changed the behavior of (an alias, a function, a `bin/` script, a git
+  alias, a cmux or vim key). If it does, update the page in the same change.
+- **Ask before adding.** The page is kept short on purpose. When a change adds a new alias,
+  function, script, git alias or hotkey, ask the user whether it should go on the page, and add it
+  only if they say yes.
+- **Match its markup.** Keys go in `<kbd>`, with modifiers (⌘ ⌃ ⌥ ⇧) as `<kbd class="mod">`.
+  Letters are uppercase, with ⇧ shown for shifted keys. Commands go in `<code>`. Each entry is one
+  `.row`. Open it in a browser afterwards to check the layout still holds.
+
 ## Testing changes
 
 - Shell files: `zsh -n <file>` (`bash -n` for the bash scripts), then `source ~/.zshrc` (or open a 
