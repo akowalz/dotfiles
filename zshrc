@@ -110,6 +110,7 @@ reload() {
   [[ -n $CMUX_SOCKET_PATH ]] && cmux reload-config >/dev/null
   if [[ -o login ]]; then exec zsh -l; else exec zsh; fi
 }
+alias rl=reload
 
 # History. zsh saves none by default.
 HISTFILE=~/.zsh_history
