@@ -14,10 +14,11 @@ alias gd='git diff-all'
 # Diff viewers: gd + where it opens. gdv vim, gdt terminal, gdw terminal and watching,
 # gdc VS Code (code), gdgh GitHub (bin/gdgh). They take the same arguments:
 #   (none)   uncommitted changes, new files included
-#   b        the whole branch: everything since it left main, uncommitted changes included
+#   b        the whole branch: everything since it left main, uncommitted changes included.
+#            branch works too.
 #   other    passed to git, e.g. gdt HEAD~3 or gdt --staged
 # gdgh always shows the branch, as pushed, since GitHub can't see anything else. gdc takes
-# nothing, b or one commit, and not other git arguments.
+# nothing, b (or branch) or one commit, and not other git arguments.
 
 # The commit where this branch left the main branch (origin/HEAD, else main or master), the
 # same base as BranchBase in vim/plugin/branchsigns.vim.
@@ -37,7 +38,7 @@ _diff_args() {
   local keep_empty
   [[ $1 == keep-empty ]] && { keep_empty=1; shift; }
   reply=("$@")
-  if [[ $1 == b ]]; then
+  if [[ $1 == (b|branch) ]]; then
     local base
     base=$(_branch_base) || return
     reply=($base "${@:2}")
@@ -82,7 +83,7 @@ gdc() {
   local reply
   _diff_args "$@" || return
   if (( $#reply > 1 )) || [[ $reply[1] == -* ]]; then
-    echo "gdc: takes nothing, b, or one commit" >&2
+    echo "gdc: takes nothing, b (or branch), or one commit" >&2
     return 1
   fi
   if (( ! $+commands[code] )); then
@@ -97,7 +98,7 @@ gdc() {
   fi
   case $1 in
     '') title='Uncommitted changes' ;;
-    b) title="Branch $(git -C $root branch --show-current)" ;;
+    b|branch) title="Branch $(git -C $root branch --show-current)" ;;
     *) title="Changes since $1" ;;
   esac
 

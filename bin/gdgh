@@ -2,7 +2,7 @@
 #
 # gdgh - open GitHub's compare view for the current branch, to use GitHub as a diff viewer.
 #
-#   gdgh          compare against the repo's default branch (origin/HEAD, usually main); gdgh b too
+#   gdgh          compare against the repo's default branch (origin/HEAD, usually main); gdgh b or gdgh branch too
 #   gdgh <base>   compare against another branch, say the one a stacked branch sits on
 #
 # The URL is base...branch: three dots, so GitHub diffs from where the branch forked off base.
@@ -18,7 +18,7 @@ branch=$(git symbolic-ref --quiet --short HEAD) || {
 }
 
 base=$1
-[ "$base" = b ] && base= # b, "the branch", like the other gd* viewers in zshrc
+case $base in b | branch) base= ;; esac # "the branch", like the other gd* viewers in zshrc
 if [ -z "$base" ]; then
   base=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" 2>/dev/null)
   base=${base#"$remote"/}
