@@ -1,0 +1,55 @@
+{
+  "name": "gdc",
+  "displayName": "gdc",
+  "description": "Opens gdc's diffs (zshrc) in one multi-file diff editor, with Source Control in the sidebar",
+  "publisher": "akowalz",
+  "version": "0.0.4",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "Only reads gdc's own lists of files and opens their diffs, so it runs in Restricted Mode too."
+    }
+  },
+  "contributes": {
+    "views": {
+      "scm": [
+        {
+          "id": "gdc.files",
+          "name": "gdc",
+          "when": "gdc.hasFiles"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "gdc.openAll",
+        "title": "Open All in One Tab",
+        "category": "gdc",
+        "icon": "$(diff-multiple)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "gdc.openAll",
+          "when": "view == gdc.files",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "gdc.openAll",
+          "when": "gdc.hasFiles"
+        }
+      ]
+    }
+  }
+}

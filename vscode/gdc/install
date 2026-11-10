@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Installs the gdc extension (extension.js) into VS Code. setup.sh runs it.
+#
+# VS Code only loads extensions it installed itself (it keeps a list of them), so a link into
+# ~/.vscode/extensions isn't enough. This packages the extension as a .vsix, the zip VS Code
+# installs from, and installs that. VS Code keeps its own copy, so re-run this after changing
+# the extension, then run "Developer: Reload Window" in VS Code.
+
+set -euo pipefail
+cd "$(dirname "$0")"
+
+if ! command -v code >/dev/null; then
+  echo "VS Code's code command isn't on PATH; skipping the gdc extension" >&2
+  exit 0
+fi
+
+version=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json)
+tmp=$(mktemp -d -t gdc-vsix)
+trap 'rm -rf "$tmp"' EXIT
+
+mkdir "$tmp/extension"
+cp package.json extension.js "$tmp/extension/"
+
+cat >"$tmp/extension.vsixmanifest" <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Language="en-US" Id="gdc" Version="$version" Publisher="akowalz" />
+    <DisplayName>gdc</DisplayName>
+    <Description xml:space="preserve">Opens gdc's diffs in one multi-file diff editor</Description>
+    <Properties>
+      <Property Id="Microsoft.VisualStudio.Code.Engine" Value="^1.90.0" />
+    </Properties>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Code" />
+  </Installation>
+  <Dependencies />
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
+  </Assets>
+</PackageManifest>
+EOF
+
+cat >"$tmp/[Content_Types].xml" <<'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension=".json" ContentType="application/json" />
+  <Default Extension=".js" ContentType="application/javascript" />
+  <Default Extension=".vsixmanifest" ContentType="text/xml" />
+</Types>
+EOF
+
+(cd "$tmp" && zip -qr gdc.vsix '[Content_Types].xml' extension.vsixmanifest extension)
+code --install-extension "$tmp/gdc.vsix" --force

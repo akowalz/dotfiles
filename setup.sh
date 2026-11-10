@@ -79,6 +79,11 @@ symlink diffnav.yml ~/.config/diffnav/config.yml
 mkdir -p ~/.config/nvim
 symlink nvim.vim ~/.config/nvim/init.vim
 
+# gdc's VS Code extension (gdc in zshrc), which opens its diffs in one multi-file diff tab.
+# Installed rather than linked: VS Code ignores extensions it didn't install itself.
+vscode/gdc/install
+printf "\n"
+
 # Link each script into a real ~/bin, rather than linking ~/bin to bin/,
 # so whatever else installs into ~/bin stays out of this repo.
 if [ -L ~/bin ] && [ "$(readlink ~/bin)" = "$(realpath bin)" ]

@@ -12,11 +12,12 @@ alias gp='git pull --prune'
 alias gd='git diff-all'
 
 # Diff viewers: gd + where it opens. gdv vim, gdt terminal, gdw terminal and watching,
-# gdgh GitHub (bin/gdgh). They take the same arguments:
+# gdc VS Code (code), gdgh GitHub (bin/gdgh). They take the same arguments:
 #   (none)   uncommitted changes, new files included
 #   b        the whole branch: everything since it left main, uncommitted changes included
 #   other    passed to git, e.g. gdt HEAD~3 or gdt --staged
-# gdgh always shows the branch, as pushed, since GitHub can't see anything else.
+# gdgh always shows the branch, as pushed, since GitHub can't see anything else. gdc takes
+# nothing, b or one commit, and not other git arguments.
 
 # The commit where this branch left the main branch (origin/HEAD, else main or master), the
 # same base as BranchBase in vim/plugin/branchsigns.vim.
@@ -70,6 +71,72 @@ gdw() {
   local reply
   _diff_args "$@" || return
   diffnav --watch --watch-cmd "git diff-all ${(j: :)${(q)reply}}"
+}
+
+# gdc: in VS Code, every changed file in one multi-file diff tab, new files included, with
+# Source Control in the sidebar. The code command can't open that view, so the vscode/gdc
+# extension (installed by setup.sh) does: gdc drops a list of the files into
+# ~/.cache/gdc/pending, and opens the repo's window, whose copy of the extension picks it up.
+# The old side of each diff is a read-only copy of the file, in a temporary folder.
+gdc() {
+  local reply
+  _diff_args "$@" || return
+  if (( $#reply > 1 )) || [[ $reply[1] == -* ]]; then
+    echo "gdc: takes nothing, b, or one commit" >&2
+    return 1
+  fi
+  if (( ! $+commands[code] )); then
+    echo "gdc: VS Code's code command isn't on PATH" >&2
+    return 1
+  fi
+  local root rev=${reply[1]:-HEAD} title tmp list file old new i
+  root=$(git rev-parse --show-toplevel) || return
+  if ! git -C $root rev-parse -q --verify "$rev^{commit}" >/dev/null; then
+    echo "gdc: no commit $rev" >&2
+    return 1
+  fi
+  case $1 in
+    '') title='Uncommitted changes' ;;
+    b) title="Branch $(git -C $root branch --show-current)" ;;
+    *) title="Changes since $1" ;;
+  esac
+
+  # each changed path, as A (added), D (deleted) or M (anything else); renames as a D and an A
+  local -A kind
+  local -a changed=(${(0)"$(git -C $root diff --name-status -z --no-renames $rev)"})
+  for (( i = 1; i < $#changed; i += 2 )); do
+    kind[$changed[i+1]]=${changed[i]/[^AD]*/M}
+  done
+  for file in ${(0)"$(git -C $root ls-files -z --others --exclude-standard)"}; do
+    kind[$file]=A
+  done
+  if (( ! $#kind )); then
+    echo "No changes."
+    return
+  fi
+
+  # the list for the extension: NUL-separated, the title, the repo, then per file its path,
+  # old side and new side. Written here, then moved into pending in one step, so the extension
+  # never reads half a list.
+  tmp=$(mktemp -d -t gdc) || return
+  list=$tmp/list
+  print -rN -- $title $root >$list
+  for file in ${(ko)kind}; do
+    old= new=$root/$file
+    if [[ $kind[$file] != A ]]; then
+      old=$tmp/old/$file
+      mkdir -p ${old:h}
+      git -C $root show "$rev:$file" >$old
+      chmod a-w $old
+    fi
+    [[ $kind[$file] == D ]] && new=
+    print -rN -- $root/$file "$old" "$new" >>$list
+  done
+
+  mkdir -p ~/.cache/gdc/pending
+  mv $list ~/.cache/gdc/pending/${tmp:t}.list
+  code $root
+  echo "Opened $#kind changed files in VS Code."
 }
 
 alias bi='bundle install'

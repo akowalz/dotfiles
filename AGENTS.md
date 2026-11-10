@@ -12,7 +12,10 @@ file, which turns a symlink back into a plain file. Its status line script is tr
 `bin/claude-statusline`, which that settings file runs as `~/bin/claude-statusline`. cmux's settings 
 live in `cmux.json`, linked to `~/.config/cmux/cmux.json` (`symlink` takes an optional destination). 
 `ghostty.conf` is linked to `~/.config/ghostty/config`; cmux reads it for terminal behavior. 
-`diffnav.yml` is linked to `~/.config/diffnav/config.yml`. `nvim.vim` is linked to 
+`diffnav.yml` is linked to `~/.config/diffnav/config.yml`. `vscode/gdc/` is a small VS Code 
+extension for `gdc` (zshrc). VS Code ignores extensions it didn't install itself, so `setup.sh` 
+installs it with `vscode/gdc/install` rather than linking it; re-run that after changing the 
+extension. `nvim.vim` is linked to 
 `~/.config/nvim/init.vim`. Neovim is the editor (`EDITOR`, and `vi`/`vim` are aliases for it), and 
 it reads `vim/` and `vimrc`, which still work in plain Vim. Keep them working in both: Neovim-only 
 parts go behind `has('nvim')` in vimrc or in `vim/lua/nvim.lua`, and Vim-only parts behind 
