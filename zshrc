@@ -374,24 +374,3 @@ path=(/usr/local/bin $HOME/bin $HOME/.local/bin $path)
 # Plugins (Brewfile)
 [ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ] &&
   source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-# Tab takes the grey suggestion when one is showing (like → and Ctrl+E), and completes as usual
-# when not, through whatever Tab was bound to before (fzf's completion, so **<Tab> still works).
-# autosuggestions must not wrap this widget: its wrapper clears the suggestion before the widget
-# runs, so the widget would never see one.
-if (( $+functions[_zsh_autosuggest_start] )); then
-  # not this widget itself, if this file is sourced again with Tab already bound to it
-  _tab_bound=${${(z)$(bindkey '^I')}[2]}
-  [[ $_tab_bound == _tab_suggestion_or_complete ]] || _tab_complete_widget=$_tab_bound
-  unset _tab_bound
-  _tab_suggestion_or_complete() {
-    if [[ -n $POSTDISPLAY ]]; then
-      zle autosuggest-accept
-    else
-      zle ${_tab_complete_widget:-expand-or-complete}
-    fi
-  }
-  zle -N _tab_suggestion_or_complete
-  ZSH_AUTOSUGGEST_IGNORE_WIDGETS+=(_tab_suggestion_or_complete)
-  bindkey '^I' _tab_suggestion_or_complete
-fi
