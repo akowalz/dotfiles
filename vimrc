@@ -481,9 +481,6 @@ endif
 " Toggle paste mode and enter insert mode with <Leader>pp
 nnoremap <Leader>pp :set paste!<CR>
 
-" Go back to the previous file with C-e
-nnoremap <C-e> :e#<CR>
-
 " Indent whole file while preserving cursor location with <Leader>i or <Leader>=
 nnoremap <Leader>i m'gg=G`'
 nnoremap <Leader>= m'gg=G`'
