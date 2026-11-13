@@ -163,6 +163,7 @@ alias cpwd='print -rn -- $PWD | pbcopy'    # copy the current directory's path
 alias j='python -m json.tool'
 
 alias md='glow -p -w 85' # read a markdown file rendered, in a pager
+alias cmd='cmux markdown' # open a markdown file rendered in a cmux panel, live-reloading
 
 alias weather='curl wttr.in/chicago'
 
