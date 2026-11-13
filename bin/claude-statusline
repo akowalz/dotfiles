@@ -3,7 +3,8 @@
 #   "statusLine": { "type": "command", "command": "~/bin/claude-statusline" }
 #   left:  directory, branch, git-mess counts
 #   right: model and effort, context meter, right-aligned to the COLUMNS Claude Code passes in
-# ANSI 16 colors only, so it follows the terminal theme.
+# ANSI 16 colors, so it follows the terminal theme, except the directory: a fixed lavender
+# to match Claude Code's own inline code color.
 
 export LC_ALL=en_US.UTF-8 # count characters, not bytes, when measuring for right-alignment
 export GIT_OPTIONAL_LOCKS=0
@@ -26,7 +27,7 @@ block() { printf '%s' "${e}[${1}m${2}${reset}"; }
 # Icons are Nerd Font symbols, which Ghostty has built in, written as escape codes.
 dir=${cwd%/}; dir=${dir##*/}
 [ "$cwd" = "$HOME" ] && dir="~"
-left=$(block 34 $'\uf115'" ${dir:-/}") # folder (open, outline)
+left=$(block '38;2;177;185;249' $'\uf115'" ${dir:-/}") # folder (open, outline), in Claude Code's lavender
 
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
   branch=$(git -C "$cwd" symbolic-ref --short -q HEAD || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
