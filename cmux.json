@@ -85,6 +85,9 @@
     }
   },
   "app": {
-    "accentColor": "cmux"
+    "accentColor": "cmux",
+    // new workspaces start in ghostty.conf's working-directory (~/code), not the
+    // current workspace's directory
+    "workspaceInheritWorkingDirectory": false
   }
 }
