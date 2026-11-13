@@ -88,6 +88,14 @@
     "accentColor": "cmux",
     // new workspaces start in ghostty.conf's working-directory (~/code), not the
     // current workspace's directory
-    "workspaceInheritWorkingDirectory": false
+    "workspaceInheritWorkingDirectory": false,
+    // Cmd-clicking a .md file opens it in the markdown viewer (`cmd` in zshrc)
+    "openMarkdownInCmuxViewer": true
+  },
+
+  // the markdown viewer: larger text, in a narrower reading column (in CSS pixels)
+  "markdown": {
+    "fontSize": 17,
+    "maxWidth": 860
   }
 }
