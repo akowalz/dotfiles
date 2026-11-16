@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code status line, set in ~/.claude/settings.json (which isn't tracked) as
+# Claude Code status line, set in ~/.claude/settings.json (tracked in a separate, private config repo) as
 #   "statusLine": { "type": "command", "command": "~/bin/claude-statusline" }
 #   left:  directory, branch, git-mess counts
 #   right: model and effort, context meter, right-aligned to the COLUMNS Claude Code passes in
@@ -23,11 +23,14 @@ reset="${e}[0m"
 block() { printf '%s' "${e}[${1}m${2}${reset}"; }
 
 # Left -------------------------------------------------------------------------
-# just the directory's name, after a folder icon; ~ for the home directory itself.
+# the directory's full path, with ~ for the home directory.
 # Icons are Nerd Font symbols, which Ghostty has built in, written as escape codes.
-dir=${cwd%/}; dir=${dir##*/}
-[ "$cwd" = "$HOME" ] && dir="~"
-left=$(block '38;2;177;185;249' $'\uf115'" ${dir:-/}") # folder (open, outline), in Claude Code's lavender
+dir=${cwd%/}
+case "$dir" in
+  "$HOME") dir="~" ;;
+  "$HOME"/*) dir="~${dir#"$HOME"}" ;;
+esac
+left=$(block '38;2;177;185;249' "${dir:-/}") # in Claude Code's lavender
 
 if git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
   branch=$(git -C "$cwd" symbolic-ref --short -q HEAD || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
