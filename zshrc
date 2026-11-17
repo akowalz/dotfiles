@@ -395,7 +395,3 @@ path=(/usr/local/bin $HOME/bin $HOME/.local/bin $path)
 # Machine-specific settings that don't belong in this public repo,
 # including language runtimes and version managers (mise, uv, bun, ...)
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
-
-# Plugins (Brewfile)
-[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ] &&
-  source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
