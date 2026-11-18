@@ -99,14 +99,15 @@
     "maxWidth": 860
   },
 
-  // notify only when an agent needs something (a permission prompt or approval), not when it
-  // finishes a turn or sits idle. Those still land in the notifications list, just without a
-  // banner, sound, pane flash or unread mark.
+  // notify only when an agent needs something (a permission prompt, approval or question), not
+  // when it finishes a turn or sits idle. Those aren't recorded at all: no banner, sound, pane
+  // flash or unread mark, no entry in the notifications list, and no stale reply left as the
+  // sidebar's latest-message line.
   "notifications": {
     "hooks": [
       {
         "id": "only-when-needed",
-        "command": "case \"$CMUX_NOTIFICATION_AGENT_CATEGORY\" in turn-complete|idle-reminder) printf '{\"effects\":{\"markUnread\":false,\"reorderWorkspace\":false,\"desktop\":false,\"sound\":false,\"command\":false,\"paneFlash\":false}}' ;; esac"
+        "command": "case \"$CMUX_NOTIFICATION_AGENT_CATEGORY\" in turn-complete|idle-reminder) printf '{\"effects\":{\"record\":false,\"markUnread\":false,\"reorderWorkspace\":false,\"desktop\":false,\"sound\":false,\"command\":false,\"paneFlash\":false}}' ;; esac"
       }
     ]
   }
