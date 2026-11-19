@@ -5,3 +5,4 @@ Brewfile.lock.json
 
 # cmux leaves this next to cmux.json while it writes settings
 *.cmux-write.lock
+.workspace-color
