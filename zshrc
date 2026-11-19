@@ -357,29 +357,30 @@ boop() {
   return code
 }
 
-# cmux: a .cmux-color file in a repo colors this workspace in the sidebar. It holds one of cmux's
-# color names (Teal, Purple, ...: see `cmux workspace-action --help`) or a hex color like #7A4FD8.
-# The nearest file in this directory or above wins. Leaving the repo keeps the color.
-_cmux_color_file=  # the file this shell last applied, so moving around inside a repo doesn't re-apply it
-_cmux_color_chpwd() {
+# A .workspace-color file in a repo colors this cmux workspace in the sidebar. (claude-config's
+# claude-session-color reads the same file for the Claude Code session color.) It holds one of
+# cmux's color names (Teal, Purple, ...: see `cmux workspace-action --help`) or a hex color like
+# #7A4FD8. The nearest file in this directory or above wins. Leaving the repo keeps the color.
+_workspace_color_file=  # the file this shell last applied, so moving around inside a repo doesn't re-apply it
+_workspace_color_chpwd() {
   [[ -n $CMUX_WORKSPACE_ID ]] && (( $+commands[cmux] )) || return
   local dir=$PWD file= color err
   while true; do
-    [[ -r $dir/.cmux-color ]] && { file=$dir/.cmux-color; break }
+    [[ -r $dir/.workspace-color ]] && { file=$dir/.workspace-color; break }
     [[ $dir == / ]] && break
     dir=${dir:h}
   done
-  if [[ -z $file ]]; then _cmux_color_file=; return; fi  # outside: re-entering applies again
-  [[ $file == $_cmux_color_file ]] && return
-  _cmux_color_file=$file
+  if [[ -z $file ]]; then _workspace_color_file=; return; fi  # outside: re-entering applies again
+  [[ $file == $_workspace_color_file ]] && return
+  _workspace_color_file=$file
   color=$(<$file)
   color=${${color%%$'\n'*}//[[:space:]]/}  # the first line, without spaces
   [[ $color =~ '^[0-9A-Fa-f]{6}$' ]] && color="#$color"  # allow hex without the #
   err=$(cmux workspace-action --workspace $CMUX_WORKSPACE_ID --action set-color --color $color 2>&1 >/dev/null) ||
-    print -u2 "cmux-color: $file: ${err:-cmux refused '$color'}"
+    print -u2 "workspace-color: $file: ${err:-cmux refused '$color'}"
 }
-add-zsh-hook chpwd _cmux_color_chpwd
-_cmux_color_chpwd
+add-zsh-hook chpwd _workspace_color_chpwd
+_workspace_color_chpwd
 
 export EDITOR=nvim
 

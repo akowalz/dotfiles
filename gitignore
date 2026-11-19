@@ -8,5 +8,6 @@ ctags
 **/.claude/settings.local.json
 **/.claude/worktrees/
 
-# per-repo cmux workspace color, read by zshrc; personal, so never committed
-.cmux-color
+# per-repo workspace color, read by zshrc (cmux) and claude-session-color (Claude Code);
+# personal, so never committed
+.workspace-color
