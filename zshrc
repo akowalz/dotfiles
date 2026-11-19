@@ -396,3 +396,9 @@ path=(/usr/local/bin $HOME/bin $HOME/.local/bin $path)
 # Machine-specific settings that don't belong in this public repo,
 # including language runtimes and version managers (mise, uv, bun, ...)
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+# cmux puts its per-tab shim folder (its claude wrapper, which adds cmux's hooks) near the front of
+# PATH when it opens a tab, but not again when `reload` re-runs this file, whose path lines above
+# then put ~/.local/bin (the real claude) ahead of it. Move the shim back to the front; typeset -U
+# drops the later copy. Last, so nothing above (or in ~/.zshrc.local) pushes it down again.
+[[ -n $CMUX_CLAUDE_WRAPPER_SHIM_ROOT ]] && path=($CMUX_CLAUDE_WRAPPER_SHIM_ROOT $path)
